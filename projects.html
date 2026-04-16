@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>INFO 290: Fundamentals of Generative AI — Final Projects</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:   #003262;
+      --gold:   #FDB515;
+      --blue-light: #1a4a7a;
+      --gold-light: #fec94e;
+      --bg:     #f5f7fa;
+      --card-bg:#ffffff;
+      --text:   #1a1a2e;
+      --muted:  #6b7280;
+      --border: #e5e7eb;
+      --radius: 12px;
+      --shadow: 0 2px 8px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
+      --shadow-hover: 0 8px 24px rgba(0,50,98,.16), 0 2px 8px rgba(0,50,98,.08);
+    }
+
+    html { scroll-behavior: smooth; overscroll-behavior: none; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overscroll-behavior: none;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--blue);
+      color: #fff;
+      padding: 0;
+    }
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px 24px;
+    }
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+    .uc-seal { display: none; }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .header-right h2 {
+      font-size: clamp(1rem, 2vw, 1.4rem);
+      font-weight: 700;
+      color: var(--gold);
+      text-align: right;
+      line-height: 1.2;
+    }
+    .header-titles h1 {
+      font-size: clamp(1.2rem, 2vw, 1.6rem);
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+    }
+    .header-titles p {
+      font-size: .9rem;
+      opacity: .8;
+      margin-top: 4px;
+    }
+    .header-stats {
+      display: flex;
+      gap: 32px;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,.15);
+      flex-wrap: wrap;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      opacity: .75;
+      margin-top: 3px;
+    }
+
+
+    /* ── GRID ── */
+    .main { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+    .no-results {
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 64px 24px;
+      color: var(--muted);
+    }
+    .no-results svg { margin: 0 auto 16px; display: block; opacity: .4; }
+    .no-results h3 { font-size: 1.1rem; margin-bottom: 6px; }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: transform .2s;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+    }
+    .card-banner-wrap {
+      position: relative;
+      overflow: hidden;
+      height: 180px;
+    }
+    .card-banner-wrap::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: 0.18;
+      mix-blend-mode: overlay;
+      pointer-events: none;
+    }
+    .card-banner {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      background: var(--blue);
+    }
+    .card-accent {
+      height: 4px;
+      background: linear-gradient(90deg, var(--blue), var(--gold));
+    }
+    .card-body { padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--blue);
+    }
+    .type-badge {
+      padding: 3px 9px;
+      border-radius: 12px;
+      font-size: .68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .badge-agentic,
+    .badge-rag,
+    .badge-finetune,
+    .badge-simulation,
+    .badge-multimodal,
+    .badge-mixed { background: var(--blue); color: #fff; }
+
+    .card-desc {
+      font-size: .85rem;
+      color: var(--muted);
+      line-height: 1.55;
+      flex: 1;
+    }
+    .card-team {
+      font-size: .8rem;
+      color: var(--muted);
+      font-style: italic;
+      line-height: 1.4;
+    }
+    .tech-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 2px;
+    }
+    .tech-chip {
+      padding: 2px 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: .72rem;
+      color: var(--muted);
+      font-family: "SF Mono", "Fira Mono", monospace;
+    }
+    .card-footer {
+      padding: 12px 20px;
+      border-top: 1px solid var(--border);
+      font-size: .78rem;
+      color: var(--blue);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: #f9fafb;
+    }
+    .card-footer svg { opacity: .7; }
+
+    /* ── MODAL OVERLAY ── */
+    #overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,20,50,.55);
+      z-index: 200;
+      backdrop-filter: blur(3px);
+      overflow-y: auto;
+      padding: 32px 16px;
+    }
+    #overlay.open { display: flex; align-items: flex-start; justify-content: center; }
+
+    .modal {
+      background: #fff;
+      border-radius: 16px;
+      max-width: 760px;
+      width: 100%;
+      position: relative;
+      box-shadow: 0 24px 64px rgba(0,0,0,.22);
+      overflow: hidden;
+      animation: slideUp .2s ease;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .modal-hero {
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .modal-hero-banner {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .modal-hero-banner-noise {
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: 0.18;
+      mix-blend-mode: overlay;
+      pointer-events: none;
+    }
+    .modal-hero-content {
+      position: relative;
+      padding: 60px 28px 28px;
+      background: linear-gradient(to bottom, rgba(0,50,98,.3) 0%, rgba(0,50,98,.78) 100%);
+    }
+    .modal-hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .modal-title {
+      font-size: clamp(1.2rem, 2vw, 1.6rem);
+      font-weight: 800;
+      line-height: 1.25;
+    }
+    .modal-title span { color: var(--gold); }
+    .modal-close {
+      background: rgba(255,255,255,.15);
+      border: none;
+      color: #fff;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background .15s;
+    }
+    .modal-close:hover { background: rgba(255,255,255,.28); }
+    .modal-subtitle {
+      font-size: .9rem;
+      opacity: .82;
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+    .modal-meta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .modal-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: .8rem;
+      opacity: .85;
+    }
+    .modal-body { padding: 28px; }
+    .section { margin-bottom: 26px; }
+    .section:last-child { margin-bottom: 0; }
+    .section-title {
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--blue);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .section-title::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .section p {
+      font-size: .9rem;
+      color: #374151;
+      line-height: 1.65;
+    }
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 10px;
+    }
+    .team-member {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: .83rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .team-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .7rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .tech-stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+    .tech-pill {
+      padding: 4px 11px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: .8rem;
+      font-family: "SF Mono", "Fira Mono", monospace;
+      color: var(--text);
+    }
+    .highlight-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
+    }
+    .highlight-item {
+      background: var(--bg);
+      border-left: 3px solid var(--gold);
+      padding: 10px 12px;
+      border-radius: 0 8px 8px 0;
+      font-size: .83rem;
+      line-height: 1.45;
+      color: #374151;
+    }
+    .modal-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+    .link-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: .85rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all .15s;
+    }
+    .link-btn-primary {
+      background: var(--blue);
+      color: #fff;
+    }
+    .link-btn-primary:hover { background: var(--blue-light); }
+    .link-btn-secondary {
+      background: var(--bg);
+      color: var(--blue);
+      border: 1.5px solid var(--border);
+    }
+    .link-btn-secondary:hover { border-color: var(--blue); background: #eff6ff; }
+
+    /* ── MODAL EXTENDED SECTIONS ── */
+    .variants-list { display: flex; flex-direction: column; gap: 8px; }
+    .variant-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--blue);
+      border-radius: 0 8px 8px 0;
+      padding: 9px 12px;
+      font-size: .83rem;
+      line-height: 1.5;
+      color: #374151;
+    }
+    .variant-name {
+      font-weight: 700;
+      color: var(--blue);
+    }
+    .challenges-list { display: flex; flex-direction: column; gap: 7px; }
+    .challenge-item {
+      display: flex;
+      gap: 10px;
+      font-size: .83rem;
+      line-height: 1.55;
+      color: #374151;
+    }
+    .challenge-item::before {
+      content: "▸";
+      color: var(--gold);
+      font-size: .85rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--blue);
+      color: rgba(255,255,255,.7);
+      text-align: center;
+      padding: 32px 24px;
+      font-size: .82rem;
+      margin-top: 48px;
+    }
+    .footer-stats {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255,255,255,.15);
+    }
+    .footer-copy { opacity: .75; }
+    footer strong { color: var(--gold); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .grid { grid-template-columns: 1fr; }
+      .modal-body { padding: 20px; }
+      .modal-hero-content { padding: 20px 20px 18px; }
+      .team-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ──────────── HEADER ──────────── -->
+<header>
+  <div class="header-inner">
+    <div class="header-top">
+      <div class="header-left">
+        <div class="uc-seal">UC</div>
+        <div class="header-titles">
+          <h1>INFO 290</h1>
+          <p>Fundamentals of Generative AI</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <h2>Spring 2026 Final Projects</h2>
+        <a href="index.html" style="display:inline-flex;align-items:center;gap:6px;margin-top:8px;color:rgba(255,255,255,.8);font-size:.82rem;line-height:1;text-decoration:none;transition:color .15s;" onmouseover="this.style.color='#FDB515'" onmouseout="this.style.color='rgba(255,255,255,.8)'">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;"><polyline points="15 18 9 12 15 6"/></svg>
+          Back to Presentation Home
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+
+<!-- ──────────── GRID ──────────── -->
+<main class="main">
+  <div class="grid" id="projectGrid"></div>
+</main>
+
+<!-- ──────────── MODAL ──────────── -->
+<div id="overlay" role="dialog" aria-modal="true">
+  <div class="modal" id="modal">
+    <div class="modal-hero" id="modalHero">
+      <img class="modal-hero-banner" id="modalHeroBanner" src="" alt="">
+      <div class="modal-hero-banner-noise"></div>
+      <div class="modal-hero-content">
+        <div class="modal-hero-top">
+          <div>
+            <div class="modal-title" id="modalTitle"></div>
+          </div>
+          <button class="modal-close" id="modalClose" aria-label="Close">&times;</button>
+        </div>
+        <div class="modal-subtitle" id="modalSubtitle"></div>
+        <div class="modal-meta" id="modalMeta"></div>
+      </div>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- ──────────── FOOTER ──────────── -->
+<footer>
+  <div class="footer-stats">
+    <div class="stat"><div class="stat-num">12</div><div class="stat-label">Projects</div></div>
+    <div class="stat"><div class="stat-num">49</div><div class="stat-label">Students</div></div>
+    <div class="stat"><div class="stat-num">5</div><div class="stat-label">Research Areas</div></div>
+    <div class="stat"><div class="stat-num">20+</div><div class="stat-label">Technologies</div></div>
+  </div>
+  <div class="footer-copy"><strong>INFO 290: Fundamentals of Generative AI</strong> &mdash; Spring 2026 &mdash; UC Berkeley School of Information</div>
+</footer>
+
+<script>
+// ─────────────────────────────────────────────────────────────────
+//  PROJECT DATA
+// ─────────────────────────────────────────────────────────────────
+const PROJECTS = [
+  {
+    id: "visioncart",
+    title: "VisionCart",
+    subtitle: "Agentic AI Shopping Assistant with Multimodal Vision",
+    type: ["agentic", "multimodal"],
+    primaryType: "agentic",
+    team: ["Kurumi Kaneko", "Quinton King", "Raras Pramudita", "Lance Santana"],
+    github: "https://github.com/kurumigithub/VisionCart",
+    description: "A 4-agent LangGraph shopping pipeline that takes image or text input, identifies garments via Qwen2.5-VL-7B vision, searches real retailers, and ranks results by style/price/fit.",
+    motivation: "Modern e-commerce remains anchored to keyword-based retrieval, a modality that often fails to capture the aesthetic preferences of individual users. Consumers already curate rich visual data on platforms like Pinterest, Instagram, and TikTok, yet these vision boards are disconnected from the point of purchase. This forces users to manually translate visual inspiration into text-based search queries, creating avoidable gaps between what they envision and what they can actually find. By leveraging multimodal models and agentic reasoning, the system moves beyond simple item-matching toward true taste synthesis. Generative AI is uniquely suited for this task because it can encode high-dimensional aesthetic features, such as the specific vibe or color palette of a street-style look, that traditional search interfaces can't define. The project builds a personalized, intent-driven retail agent that reduces search friction and filters out products misaligned with a user's established taste profile.",
+    dataScale: "Pinterest-style vision boards (~5 images per session). Real-time product listings via SerpAPI from Google Shopping. Qwen2.5-VL-7B for vision and Qwen2.5-3B for conversational synthesis.",
+    architecture: "4-node LangGraph multi-agent pipeline with modular state-sharing: (1) Stylist Agent (Qwen2.5-VL-7B): zero-shot aesthetic interpretation producing a structured style persona with color palettes, textures, and moods; (2) Procurement Agent (Qwen2.5-3B via HuggingFace): generates search queries, reads critic feedback on retries, fetches Google Shopping results via SerpAPI; (3) Critic/Ranker Agent, scores candidates on image similarity, text alignment, and semantic matching against the style persona; (4) Output Node (Qwen2.5-7B-Instruct): presents ranked products with style reasoning and allows user feedback for iterative refinement.",
+    variants: [
+      { name: "Linear Pipeline", desc: "Sequential agent execution without retry loops." },
+      { name: "Collaborative Graph + Retry", desc: "Ranker feeds back to Procurement on retry, measured by MRR and Precision@K." },
+      { name: "Mechanical vs. LLM Query Gen", desc: "Compares structured query generation vs. LLM-assisted query generation in Procurement." },
+      { name: "Local Qwen vs. Claude API", desc: "Compares Qwen2.5-3B output agent against Claude API on style alignment quality, latency, and cost." }
+    ],
+    challenges: [
+      "JSON robustness: LLM outputs contained conversational artifacts breaking parsers, fixed via regex extraction and fallback schema.",
+      "GPU setup: Qwen models required Google Colab; significant adjustments needed to run on VS Code for testing.",
+      "Retrieval bottleneck: Semantic style intent must be translated to keyword queries for Google Shopping, creating a gap between aesthetic intent and retrieved results."
+    ],
+    experiments: "5 targeted experiments: (1) mechanical vs. LLM-assisted query generation measuring Precision@K and API cost; (2) unified vs. split ranker/critic on Precision@5 and rejection accuracy; (3) linear vs. retry graph on MRR/Precision@K; (4) local Qwen vs. Claude API on style alignment; (5) stylist agent consistency evaluation. Metrics: Precision@K, MRR, mean CLIP cosine similarity, LLM-as-judge (1–5 scale across aesthetic accuracy, product fit, explanation quality).",
+    milestoneProgress: "All 4 agents implemented and individually tested. End-to-end pipeline functional. JSON robustness addressed: initial LLM outputs often contained conversational artifacts that broke downstream parsers, fixed via regex-based extraction and fallback schema to guarantee structured outputs. Qwen models running via Google Colab with adjustments for VS Code testing. Key open challenge: the procurement agent must translate the rich style persona into keyword-based queries for Google Shopping, creating a gap between semantic aesthetic intent and retrieved results. Exploring hybrid reranking and fallback query expansion strategies.",
+    keyResults: [
+      "4-node LangGraph pipeline with modular state-sharing via unified state object",
+      "Qwen2.5-VL-7B style persona encoding: color palette, texture, mood, product categories",
+      "Procurement agent reads critic feedback on retries for improved query steering",
+      "CLIP cosine similarity used as primary objective quality signal requiring no manual labeling"
+    ],
+    techStack: ["LangGraph", "Qwen2.5-VL-7B", "Qwen2.5-3B", "SerpAPI", "CLIP", "HuggingFace", "Python"],
+    area: "Agentic AI · Multimodal"
+  },
+  {
+    id: "bellybutton",
+    title: "Belly Button",
+    subtitle: "Real-Time Conversational Restaurant Recommender",
+    type: ["agentic", "rag"],
+    primaryType: "agentic",
+    team: ["Supakarn Bunlert", "Gyuyeon Stella Jung", "Jessie Deng", "Tubal Theodros"],
+    github: "https://github.com/courtofdreams/belly-button",
+    description: "A conversational dining guide that aggregates live data from Reddit, Yelp, and Google Maps to deliver hyper-personalized restaurant recommendations through multi-turn natural language conversation.",
+    motivation: "Yelp and Google Maps rank restaurants by aggregate star ratings, but high ratings often reflect outdated reviews rather than what's actually good right now. We use Reddit and Google Map Place reviews to surface genuine, community-driven restaurant recommendations. The final results are motivated by a simple idea: community buzz is a better predictor of a great meal today than a 4.6-star average built over 5 years. Our agent will address this gap by monitoring and extracting the most recent reviews from old and new restaurants to show users which restaurants are buzzing and worth going to currently. The primary users who would benefit from this are local food-lovers and travelers who want to eat where the city is actually popping at this very moment. Generative AI is appropriate to use here because the task is to synthesize information and provide reasoning.",
+    dataScale: "Google Maps API: 20–60 results per query. Yelp Fusion API: up to 20 results per query (reviews endpoint restricted on free tier). Reddit (PRAW): 279 clean comment rows from r/AskSF and r/SFFood, spanning 90 days, with 100 comments from the past 7 days.",
+    architecture: "Tool-augmented RAG pipeline with orchestration. Application layer accepts natural-language queries. Orchestration layer coordinates tool calls to Google Maps (Search Nearby + Text Search APIs), Yelp (Business Search + Detail), and a pre-built Reddit database. Yelp data uses a buzz score weighted by recent review volume (60%) and average rating (40%). Reddit data uses a two-stage relevance filter: keyword pre-filter → Claude Haiku LLM classifier to confirm genuine restaurant recommendation threads. Candidate aggregation merges all sources; LLM acts as semantic ranker and summarizer.",
+    variants: [
+      { name: "Heuristic Ranking", desc: "Weighted score: 70% rating + 30% log-transformed review count." },
+      { name: "LLM-Based Ranking", desc: "LLM prioritizes restaurants based on rating, review context, and community sentiment." },
+      { name: "Baseline LLM vs. Multi-Source RAG", desc: "Compares parametric knowledge alone vs. live data fusion." }
+    ],
+    challenges: [
+      "Yelp Reviews endpoint returns 404 on free tier, review text sourced from Google Maps and Reddit instead.",
+      "Recency filter trade-off: 3-month window may yield too few reviews for scoring, longer window dilutes current trends.",
+      "Sentiment analysis can disproportionately influence ranking, requires careful balancing with numerical features."
+    ],
+    experiments: "3 evaluation dimensions: (1) Recency, average age of most recent review and proportion with activity in recent window; (2) Quality, average ratings, review counts, and positive sentiment from Google Maps and Yelp; (3) Consistency, Jaccard similarity of recommendation lists across repeated identical queries to assess reliability.",
+    milestoneProgress: "All three data source integrations operational. Reddit master database built: 279 clean comment rows from 40 approved posts in r/AskSF and r/SFFood, with 100 comments from the past 7 days. Two-stage relevance filter implemented: keyword pre-filter + Claude Haiku LLM classifier confirming posts are genuine restaurant recommendation threads. query_database() and format_as_llm_context() functions complete for instant retrieval at query time. Yelp Fusion API integrated with buzz scoring (60% recent review volume + 40% average rating). Google Maps API integrated using Search Nearby and Text Search with quality thresholds (rating \u2265 4.0, review count \u2265 50). Chatbot-style frontend (MVP website) built. End-to-end pipeline tested with real San Francisco restaurant queries.",
+    keyResults: [
+      "279-comment Reddit database refreshed daily with linear recency decay scores",
+      "Two-stage Reddit filter: keyword pre-filter + Claude Haiku LLM classifier",
+      "Buzz score: 60% recent review volume + 40% average rating per restaurant",
+      "Filters: rating ≥ 4.0 and user rating count ≥ 50 before candidate ranking"
+    ],
+    techStack: ["PRAW", "Google Maps API", "Yelp Fusion API", "Claude Haiku", "Python", "LLM Ranking"],
+    area: "Agentic AI · RAG"
+  },
+  {
+    id: "marketing-asset",
+    title: "Marketing Asset Generation",
+    subtitle: "AI-Powered Film Marketing Taglines & Poster Art",
+    type: ["rag", "agentic", "multimodal"],
+    primaryType: "rag",
+    team: ["Ryuichi Ikeda", "Priya Charagondla", "Shivani Parikh", "Nseke Ngilbus", "Lena Ehrenreich"],
+    github: "https://github.com/ryuichi-github/ryuichi-github-info290-2026s-group5",
+    description: "Generates film marketing taglines and poster artwork by leveraging a RAG system built on 4,816 TMDB movies. V3 integrates Gemini 2.5 Flash for higher-quality visual outputs and an agentic refinement loop.",
+    motivation: "We are building a system that generates professional-grade marketing assets: taglines, promotional overviews, and film poster art direction. The system uses historical TMDB data to guide asset creation. Today, creating marketing assets requires manual iteration to connect creative intuition with proven industry methods. Traditional LLMs generate creative text but lack strategic grounding and necessary industry nuance. We use RAG, historical patterns, and multi-agent workflows to ground creativity in best practices. This system serves creative professionals, marketing agencies, and product development teams, automating data-driven content creation.",
+    dataScale: "4,816 movies from TMDB API (title, tagline, overview, genre IDs, popularity, vote average). 4,312 poster images available via TMDB CDN. 504 movies (10.5%) removed for missing taglines. Sentence-BERT (all-MiniLM-L6-v2, 384-dim) embeddings indexed in FAISS.",
+    architecture: "Three progressively enriched variants. Retrieval: each movie embedded as title+tagline+overview via Sentence-BERT, FAISS-indexed with genre-based filtering at k=5. Structured input format (core_premise, thematic_core, negative_constraints) replaces free-text to prevent narrative contamination. Visual grounding via Gemini 2.5 Flash captions capturing composition, lighting, color, mood, and typography. V3 agentic refinement loop (max_iter=3 with early stopping) evaluates outputs via LLM-as-Judge on commercial appeal, genre coherence, and narrative fidelity, then regenerates if below threshold.",
+    variants: [
+      { name: "V1: Zero-Shot Baseline", desc: "No retrieval. Structured input only. Establishes parametric baseline." },
+      { name: "V2: RAG + Visual Grounding", desc: "Retrieval from TMDB corpus + Gemini 2.5 Flash poster captions for visual context." },
+      { name: "V3: Agentic RAG", desc: "V2 + iterative LLM-as-Judge refinement loop (Reflexion / Self-Refine pattern, max 3 iterations)." }
+    ],
+    challenges: [
+      "Free-text prompts caused narrative contamination (model invented plot elements not in premise): solved with structured input format.",
+      "Early visual outputs were generic without compositional detail, motivated VLM integration; Gemini 2.5 Flash outperformed vit-gpt2 and BLIP-2.",
+      "LangChain version conflicts with Colab, reimplemented judge and refinement loop as plain Python functions."
+    ],
+    experiments: "Controlled evaluation with constant base model (Mistral-7B-Instruct), prompt template, and retrieval corpus across all variants. 4 qualitative dimensions scored by LLM-as-Judge: Narrative Fidelity, Genre Alignment, Visual Specificity, Creative Specificity, and Output Format Validity. V1 vs. V2 comparison complete; full V1/V2/V3 evaluation pending V3 deployment.",
+    milestoneProgress: "V1 (Zero-Shot Baseline) and V2 (RAG + Visual Grounding) fully implemented. Structured input format (core_premise, thematic_core, negative_constraints) developed after early experiments showed free-text prompts caused narrative contamination, model invented plot elements not in the premise. Multiple VLM captioners evaluated (vit-gpt2, BLIP-2, Gemini 2.5 Flash); Gemini 2.5 Flash identified as best captioner for descriptive richness and consistency. V3 agentic refinement loop built and tested: max 3 iterations with early stopping, approximately 90 seconds worst-case runtime on Colab G4, consistent with Self-Refine findings of diminishing returns beyond 2–3 iterations. LangChain version conflicts with Colab resolved by reimplementing judge and refinement loop as plain Python functions. Evaluation pipeline with 5-dimension LLM-as-Judge scoring module complete. V1 vs. V2 comparison feasible; full three-way evaluation pending V3 deployment.",
+    keyResults: [
+      "Structured input (core_premise + thematic_core + negative_constraints) dramatically reduces narrative contamination",
+      "Gemini 2.5 Flash outperforms vit-gpt2 and BLIP-2 for poster visual description richness",
+      "V3 refinement loop: ~90s worst-case runtime with early stopping, diminishing returns beyond 2–3 iterations",
+      "Genre-based FAISS filtering at k=5 improves stylistic diversity vs. zero-shot generation"
+    ],
+    techStack: ["Sentence-BERT", "FAISS", "Gemini 2.5 Flash", "Mistral-7B-Instruct", "TMDB API", "LLM-as-Judge", "Python"],
+    area: "RAG · Multimodal"
+  },
+  {
+    id: "function-calling-slm",
+    title: "Sub-3B Function-Calling SLMs",
+    subtitle: "Teaching Small Language Models to Call APIs via GRPO + Curriculum Learning",
+    type: ["finetune"],
+    primaryType: "finetune",
+    team: ["Arnur Sabet", "Assel Sakenkyzy", "Diara Bagayeva", "Meruyert Tastybay"],
+    github: "https://github.com/arnursabet/info290-function-calling-slm",
+    description: "Fine-tuning Qwen2.5-3B with GRPO reinforcement learning, function-call masking, and curriculum learning to achieve >70% on BFCL V4: setting a new state-of-the-art for sub-3B function-calling models.",
+    motivation: "Function calling is the core capability that separates chatbots from AI agents. When an agent needs to check the weather, book a flight, or query a database, it doesn't answer directly. Instead, it outputs a structured function call with the correct tool name and parameters. Today, reliable function calling requires large proprietary models like GPT-4, which cost roughly $0.03 per call and introduce 1–2 seconds of latency. For agentic systems that make hundreds of tool calls per task, this adds up fast. Recent work has shown that small language models (SLMs) can be trained for function calling, but performance drops sharply below 7 billion parameters. On BFCL V4, sub-3B models score 20–40% on complex multi-turn and agentic tasks, compared to 85%+ for state-of-the-art 7B models. But real-world deployment on edge devices, browser-based agents, and cost-sensitive applications at scale often requires models much smaller than 7B. This project pushes the frontier: combining GRPO reinforcement learning, function masking, and curriculum training to build a sub-3B model that is actually reliable at tool use.",
+    dataScale: "Salesforce xLAM-function-calling-60k (CC-BY-4.0): 60,264 examples filtered to 4,000 training examples (2,589 single-call + 1,411 parallel-call). 67% of examples undergo function masking (random alphanumeric identifiers replace function/parameter names). ~400 synthetic no-call examples planned to cover BFCL V4 hallucination-detection category (xLAM has zero irrelevance examples).",
+    architecture: "All variants use Qwen2.5-3B-Instruct with QLoRA: 4-bit NF4 quantization, rank-64 adapters (α=128, dropout 0.05) targeting 7 linear projection modules. SFT: HuggingFace Trainer, 3 epochs, effective batch size 16, lr 2×10⁻⁴ cosine decay, fp16 (T4 GPU). GRPO: TRL 0.27.1 GRPOTrainer in cold-start mode (no SFT initialization), 4 completions per prompt, two rewards, correctness (1.0 if function name + all argument key-value pairs match ground truth) and format (0.5 if valid <tool_call> XML tags), lr 5×10⁻⁷, KL penalty β=0.04.",
+    variants: [
+      { name: "V1: Zero-Shot Baseline", desc: "Qwen2.5-3B-Instruct with no fine-tuning." },
+      { name: "V2: SFT Only", desc: "QLoRA fine-tuning on unmasked 4K examples. Training complete." },
+      { name: "V3: SFT + Function Masking", desc: "QLoRA on masked 4K. Lower validation loss at every epoch vs. V2. Training complete." },
+      { name: "V4: GRPO Cold-Start", desc: "RL from scratch on unmasked 4K. Code complete." },
+      { name: "V5: GRPO + Masking", desc: "RL from scratch on masked 4K. Code complete." },
+      { name: "V6: Full Recipe", desc: "GRPO + curriculum learning (easy→complex ordering). Planned." }
+    ],
+    challenges: [
+      "xLAM dataset contains zero no-call (irrelevance) examples, but BFCL V4 allocates 10% score to hallucination detection, requires synthesizing ~400 semantically incompatible query-tool pairs.",
+      "xLAM uses non-standard type strings (str, int, List[str]) requiring custom conversion to JSON Schema.",
+      "SFT init at small scale causes memorization limiting RL exploration, GRPO runs in cold-start mode following ToolRL and Nemotron-Tool-N1 findings."
+    ],
+    experiments: "Evaluated on full BFCL V4 benchmark (AST accuracy: exact match on function name + argument values). 6 categories: simple, multiple, parallel, irrelevance, multi-turn, agentic. Reference baselines: Qwen2.5-3B zero-shot ~52%, xLAM-2-3b ~65%, Hammer2.1-3B ~68%. Target: 70%+ (new sub-3B SOTA). Secondary metrics: latency (ms/call) and throughput (calls/sec via vLLM).",
+    milestoneProgress: "Both SFT variants completed training on a T4 GPU (~43 minutes each). Validation loss decreased steadily over 3 epochs and converged by epoch 2. V3 (SFT + masking) achieves lower validation loss at every epoch vs. V2 (unmasked): 0.0143 vs. 0.0165 at epoch 3, providing early evidence that function masking improves generalization to unseen APIs. Full data pipeline executed: 60K xLAM examples downloaded, filtered to 4K (2,589 single-call + 1,411 parallel-call), masked dataset produced (2,680 masked / 1,320 unmasked), both formatted as JSONL for Qwen2.5's chat template. GRPO cold-start variants (V4 unmasked, V5 masked) code complete. V6 (GRPO + curriculum learning) planned. BFCL V4 evaluation of both trained SFT adapters is the immediate next step.",
+    keyResults: [
+      "V3 SFT + masking: lower validation loss at every epoch vs. unmasked V2 (0.0143 vs. 0.0165)",
+      "Function masking: 67% of examples have function/parameter names replaced with random identifiers",
+      "GRPO rewards: correctness (1.0 exact match) + format (0.5 valid XML tags)",
+      "Target: exceed Hammer2.1-3B's 68% BFCL V4 score; 70%+ = new sub-3B SOTA"
+    ],
+    techStack: ["Qwen2.5-3B-Instruct", "QLoRA", "GRPO", "TRL 0.27.1", "xLAM-60k", "BFCL V4", "vLLM", "HuggingFace"],
+    area: "Fine-tuning / RL"
+  },
+  {
+    id: "ux-research-rag",
+    title: "UX Research RAG",
+    subtitle: "Raw Interview Transcripts → User Stories & Pain Points",
+    type: ["rag"],
+    primaryType: "rag",
+    team: ["Azad Jagtap", "Vinay Thorat", "Romit Kar", "Arno Demarteau"],
+    github: "https://github.com/ademcodesproducts/info290-user_story-rag_system.git",
+    description: "Automates UX research synthesis by transcribing raw interview audio with Whisper, indexing into ChromaDB/FAISS, and generating structured user stories and pain points via GPT-4o: reducing hours of synthesis to minutes.",
+    motivation: "Product managers and UX researchers invest significant time conducting user interviews, synthesizing meeting notes, reviewing product requirement documents, and analyzing customer feedback, yet the insights buried in these materials remain fragmented and difficult to access. When a PM asks 'What did users say about onboarding last quarter?', they typically face a manual hunt through scattered transcripts, Confluence pages, and Slack threads. There is no reliable, searchable system that can surface the right answer with evidence. Generative AI is uniquely suited to this problem: it can process large volumes of unstructured, conversational text, reason over heterogeneous sources, and produce structured outputs like pain points and user stories in a format that product teams can immediately act on. The primary beneficiaries are product managers, UX researchers, and product designers who want insight, not search results.",
+    dataScale: "Raw interview audio and transcript files. Dual vector index in ChromaDB and FAISS for retrieval. GPT-4o used for structured user story and pain point synthesis.",
+    architecture: "End-to-end pipeline: (1) Whisper transcribes raw interview audio to text; (2) transcripts chunked and embedded into a dual ChromaDB + FAISS vector index; (3) GPT-4o retrieves relevant chunks and synthesizes structured user stories, pain points, and actionable insights following standard UX research schema.",
+    variants: [
+      { name: "ChromaDB Retrieval", desc: "Semantic similarity search over transcript chunks for user story generation." },
+      { name: "FAISS Retrieval", desc: "High-speed approximate nearest neighbor search for comparison." }
+    ],
+    challenges: [
+      "Interview audio quality variations affect Whisper transcription accuracy.",
+      "Mapping diverse interview content to standardized user story schema requires careful prompt engineering.",
+      "Ensuring synthesized stories remain grounded in actual interview data without hallucination."
+    ],
+    experiments: "Evaluation of RAG pipeline vs. direct GPT-4o synthesis on accuracy and grounding. Human expert review of generated user stories against original transcripts for fidelity assessment.",
+    milestoneProgress: "Variant A (Document-aware RAG) implemented and tested end-to-end on 45 synthetic Databricks documents. Type-aware chunking pipeline complete (section-based for retros and PRDs, paragraph + merge for transcripts and tickets, targeting ~400 tokens with 80-token overlap). OpenAI text-embedding-3-small embeddings stored in ChromaDB persistent collection with cosine similarity. 15 labeled query-output test cases constructed in data/eval/test_set.json (each specifying PM query, expected source documents, and expected pain-point keywords). All four real-world datasets acquired (AMI Meeting Corpus 4.17 GB, MediaSum 1.51 GB, JOSSE Jira 193 MB, Mendeley User Stories) and actively being preprocessed. Variant B (Hybrid retrieval: Qdrant + BM25 + cross-encoder reranker) planned for final submission.",
+    keyResults: [
+      "Whisper audio transcription → structured text",
+      "Dual ChromaDB + FAISS vector index for flexible retrieval",
+      "GPT-4o structured user story & pain point synthesis",
+      "Hours of manual synthesis compressed to minutes"
+    ],
+    techStack: ["Whisper", "ChromaDB", "FAISS", "GPT-4o", "LangChain", "Python"],
+    area: "RAG"
+  },
+  {
+    id: "neuro-orchestrator",
+    title: "Neuro-Orchestrator Agent",
+    subtitle: "AuDHD Executive Function Support via Personalized AI Coaching",
+    type: ["agentic", "finetune"],
+    primaryType: "agentic",
+    team: ["Delvin Marimo", "James Ning", "Jaime Wong", "Monica Zhao"],
+    github: "https://github.com/hoshistardust/info290-final-neuro-orchestrator-agent",
+    description: "A 6-node LangGraph agent supporting AuDHD (autism + ADHD) individuals with executive dysfunction. Llama 3 is fine-tuned on 9,200 CoT pairs and 60 synthetic AuDHD conversations grounded in clinical research.",
+    motivation: "Neurodivergent individuals with AuDHD often experience executive dysfunction, difficulty with task initiation, sequencing, and time estimation, which makes complex goals like 'apply to PhD programs' feel overwhelming. Traditional productivity tools are static and cannot adapt to vague objectives, fluctuating energy levels, or mid-task blockers like hyperfocus spirals and decision paralysis. An agentic AI system can dynamically decompose goals, validate plans against real-world constraints, and re-plan when things change, acting as a cognitive scaffold that bridges intention and action. The motivation for the fine-tuned variant comes from the limits of general-purpose models: without domain adaptation, they produce generic productivity advice that overlooks energy-level calibration, the need for low-friction first steps, and neuro-affirming communication style. Fine-tuning aims to internalize these considerations within the model itself rather than relying entirely on prompt-level guidance. The primary beneficiaries are neurodivergent students and professionals, though the system is broadly useful for anyone managing high cognitive loads.",
+    dataScale: "Dataset 1: mattwesney/CoT_Neurodivergent_vs_Neurotypical_Interactions (HuggingFace, MIT): 9,200 QA pairs with chain-of-thought reasoning traces, covering neurodivergent and neurotypical interaction patterns. Dataset 2: 60 team-generated synthetic multi-turn AuDHD conversations (4-turn: brain dump → DAG breakdown → blocker → re-plan), spanning 6 domains and 3 difficulty levels, generated with Claude Sonnet 4.6 grounded in Carik et al. (2025).",
+    architecture: "Single-agent, stateful LangGraph graph with 6 core nodes: intake → planner → constraint checker → execution → feedback → replan. State flows as a shared dictionary with conditional edges. Structured prompts include neurodivergent-focused instructions, JSON-based output formatting, and calibration to user energy and time context. ChromaDB vector store preserves completed task plans across sessions (RAG variant retrieves top-3 similar past plans at intake). LoRA fine-tuning targets neuro-affirming communication style and structured DAG generation.",
+    variants: [
+      { name: "Variant A: Prompt Design", desc: "Llama 3 + structured neurodivergent-focused prompts. Baseline configuration." },
+      { name: "Variant B: Prompt + RAG", desc: "Adds ChromaDB retrieval of past task plans to reduce cold-start generation." },
+      { name: "Variant C: LoRA + Prompt + RAG", desc: "Fine-tuned Llama 3 replaces baseline model within the same graph architecture." }
+    ],
+    challenges: [
+      "Synthetic generation bias: neither dataset contains real user inputs, potentially limiting coverage of actual AuDHD linguistic and emotional variability, plan to supplement with user testing.",
+      "Topic field in mattwesney dataset has 6,207 free-text values with no fixed taxonomy, making keyword filtering noisier than retaining the full dataset.",
+      "Training pipeline required BPE tokenization (cl100k_base) with sliding-window GPTDataset exploration across context window, embedding dimensions, batch size, and stride overlap."
+    ],
+    experiments: "A vs. B: task completion rate, node count accuracy (target 4–8 steps), constraint checker pass rate on first attempt, tool-calling accuracy (Limitus/agentic-ai-eval benchmark). B vs. C: LLM-as-judge scores on logical ordering, time estimate realism, task clarity, and neurodivergent-friendliness (each 1–5). Adaptability test: human evaluators introduce mid-plan blockers. Efficiency tracked: tokens per session, replan cycles triggered, latency to first task delivery.",
+    milestoneProgress: "LangGraph 6-node architecture (intake, planner, constraint checker, execution, feedback, replan) implemented with conditional routing on feasibility checks and user feedback. Tokenization training pipeline built: BPE tokenization using gpt-4o (cl100k_base) tokenizer across both datasets (9,260 combined examples); sliding-window GPTDataset explored across context window, embedding dimensions, batch size, and stride overlap. 60 synthetic AuDHD conversations generated using Claude Sonnet 4.6, grounded in Carik et al. (2025); spans 6 domains (academic, career, health, personal administration, social, creative) across 3 difficulty levels; validated by team. Both datasets converted to JSONL for Llama 3 fine-tuning: CoT reasoning traces serialized into assistant turns for mattwesney dataset, full DAGs serialized into assistant turns for synthetic dataset. ChromaDB vector store integrated for RAG variant, retrieves top-3 similar past plans at intake. LoRA fine-tuning on both datasets planned as next step.",
+    keyResults: [
+      "6-node LangGraph stateful graph with conditional routing on feasibility checks and user feedback",
+      "9,200 CoT QA pairs fine-tune Llama 3 for neuro-affirming communication style",
+      "60 synthetic 4-turn AuDHD conversations encode DAG generation in assistant turns",
+      "ChromaDB RAG variant retrieves top-3 similar past plans to reduce cold-start repetition"
+    ],
+    techStack: ["LangGraph", "Llama 3", "LoRA", "ChromaDB", "Claude Sonnet 4.6", "HuggingFace", "Python"],
+    area: "Agentic AI · Fine-tuning"
+  },
+  {
+    id: "lawllm",
+    title: "LawLLM",
+    subtitle: "AI Copyright Law Research Assistant with ICL vs. RAG Comparison",
+    type: ["rag"],
+    primaryType: "rag",
+    team: ["Sarah Algashgari", "June Fang", "Michelle Lin", "Wendi Zheng"],
+    github: null,
+    driveLink: "https://drive.google.com/drive/folders/1dK5LXYaxBUbn7e6DyH9kqoWuGRbtebRn",
+    description: "A legal research assistant covering 5 AI copyright cases, comparing RAG vs. In-Context Learning using FAISS and GPT-4o-mini. Initial results show ICL outperforming RAG on human evaluation despite equal LLM-as-judge scores.",
+    motivation: "As artificial intelligence systems are becoming increasingly prevalent in today's society, the need to govern them is rising as well. However, there is no clear agreement on how AI should be regulated, and new lawsuits are constantly setting new precedents. The result is a fast-moving yet fragmented legal landscape that is hard to follow for experts and the broader public alike. Judicial opinions are often long and technical, making it hard for policymakers and researchers to understand how rules around AI technologies are evolving. At the same time, there is growing demand for these systems to be developed and deployed responsibly. For technologists, designing ethical products requires understanding how courts are interpreting and applying these laws. To address this gap, the project builds an AI Litigation &amp; Precedent Analyzer to help policymakers, researchers, and responsible AI practitioners track how litigation is shaping AI governance in a transparent and accessible way.",
+    dataScale: "5 manually curated U.S. court complaints involving AI copyright disputes (e.g., OpenAI, Adobe, Meta). Each ~20 pages. Fixed-size chunking: 400 words with 100-word overlap. Each chunk stored with source (case name), section_id, and chunk_id. Embedding model: all-MiniLM-L6-v2 (Sentence-BERT). FAISS index of all chunk embeddings.",
+    architecture: "RAG pipeline: PDF → PyPDF text extraction → regex-based cleaning (remove case headers, page numbers, normalize whitespace) → section splitting (ALL CAPS headings + Roman numeral markers) → fixed-size chunking (400w/100w overlap) → Sentence-BERT embeddings → FAISS index → top-5 retrieval → labeled chunk context → GPT-4o-mini (temp=0) generation with citation instructions. ICL pipeline: same 5 cases → GPT-4o-mini case brief summaries → single combined context block → GPT-4o-mini answering using only fixed context.",
+    variants: [
+      { name: "RAG Pipeline", desc: "FAISS retrieval of top-5 semantically similar chunks. Traceable chunk citations in output." },
+      { name: "In-Context Learning (ICL)", desc: "GPT-4o-mini generated case briefs provided directly in prompt. Human evaluation found this performed better despite equal LLM-as-judge scores." }
+    ],
+    challenges: [
+      "CourtListener API keyword search returned many irrelevant cases where AI was mentioned only in passing, switched to manually curated high-quality dataset.",
+      "Inconsistent document structure across complaints makes rule-based section splitting fragile.",
+      "Fixed-size chunking splits sentences or legal arguments mid-argument, mitigated with 100-word overlap; semantic chunking planned."
+    ],
+    experiments: "LLM-as-judge evaluation on 5 dimensions: groundedness, completeness, overclaiming, citation accuracy, and legal precision. Both RAG and ICL scored all 5s on automated judge; human evaluation found ICL performed better. Next phase: hold input corpus, retrieval corpus, and evaluation questions constant while varying chunking strategy (fixed vs. sentence-based), top-k (3 vs. 5), prompt design, and generation model (GPT, Llama, Gemini, Claude). Metrics: ROUGE, embedding similarity, relevance, citation accuracy, cost and latency per query.",
+    milestoneProgress: "Full RAG pipeline implemented: PyPDF extraction, regex-based cleaning, section splitting, fixed-size chunking (400w/100w overlap), Sentence-BERT embeddings, FAISS index, top-5 retrieval, and GPT-4o-mini generation with citation instructions. ICL variant built: GPT-4o-mini case brief summaries for all 5 cases provided directly in prompt. LLM-as-judge evaluation framework implemented across 5 dimensions (groundedness, completeness, overclaiming, citation accuracy, legal precision). Initial evaluation complete: both RAG and ICL received all 5s on automated LLM-as-judge. However, based on human evaluation, we believe the in-context learning model performed better. In the next phase we plan to build out a more robust LLM-as-a-judge evaluator, and conduct comparisons by holding the input corpus, retrieval corpus, and evaluation questions constant while varying chunking strategy, top-k, prompt design, and generation model (GPT, Llama, Gemini, Claude).",
+    keyResults: [
+      "RAG + ICL both score all 5s on LLM-as-judge; human evaluation favors ICL, motivating deeper evaluation methodology",
+      "Fixed-size chunking (400w/100w overlap) with labeled chunks enables traceable citation in output",
+      "Sentence-BERT (all-MiniLM-L6-v2) embeddings for semantic similarity over legal text",
+      "Future: sentence-based chunking, top-k 3 vs. 5, multi-model comparison (GPT/Llama/Gemini/Claude)"
+    ],
+    techStack: ["FAISS", "Sentence-BERT", "GPT-4o-mini", "PyPDF", "Python", "LLM-as-Judge"],
+    area: "RAG"
+  },
+  {
+    id: "music-memory",
+    title: "Music & Memory",
+    subtitle: "Therapeutic Playlist Generation for Dementia Care",
+    type: ["rag"],
+    primaryType: "rag",
+    team: ["Anika Bhagavatula", "Sunny Lee", "Mabel Teo", "Sejin Kim"],
+    github: "https://github.com/anikanb-32/musicandmemory",
+    description: "Generates personalized playlists and caregiver memory cards for dementia patients by matching life memories to 2,381 Billboard songs (1950–1990) via a 3-stage RAG pipeline powered by GPT-4o.",
+    motivation: "Over 55 million people worldwide live with dementia, and music therapy is one of the most effective non-pharmacological interventions available. The auditory cortex and medial prefrontal cortex, where music recognition and autobiographical memory overlap, are among the last brain regions to degrade in Alzheimer's. A patient who can't recognize family members will sing along to a song from their youth. The problem is not whether personalized music works, but identifying the right songs. Caregivers currently guess playlists, relying on generational defaults rather than music tailored to a patient's life timeline and culture. Mapping a biographical profile to a precise playlist requires contextual reasoning across fragmented data sources. Dementia caregivers, elder-care facilities, music therapists, and the families they serve would all benefit from this kind of automated, evidence-grounded curation.",
+    dataScale: "Billboard Hot 100 (1958–2024) via Kaggle: ~330,000 chart entries → 29,681 unique songs after deduplication. Filtered to reminiscence bump window (1950–1990) with top-500/decade sampling → 2,381 songs. MusicBrainz Recording Database: regional release metadata (country of origin, release date, match confidence scores) for culturally relevant enrichment beyond the US market.",
+    architecture: "3-stage pipeline: (1) Biographical Profiling, GPT-4o converts patient profile (birth year, hometown, cultural background, dated life events) into 5–8 retrieval queries targeting four dimensions: temporal (reminiscence bump ages 15–25), geographic (regional radio/music scenes), cultural (genres/artists salient to community), and event-anchored (songs linked to weddings, graduations, wartime); (2) Retrieval, FAISS IndexFlatIP with L2-normalized embeddings (text-embedding-3-small, 1536-dim), cosine similarity, multi-query deduplication by highest score, capped at 20 unique songs; (3) Generation, GPT-4o synthesizes retrieved context + patient profile into a ranked 10-song playlist with relevance justifications and 3 caregiver conversation cards linking songs to the patient's biography.",
+    variants: [
+      { name: "Variant A: Baseline LLM", desc: "No retrieval. Full patient profile in prompt only. Tests GPT-4o parametric knowledge alone." },
+      { name: "Variant B: RAG, Birth Year", desc: "FAISS retrieval (k=20) with birth year ±5 years as query. Isolates grounding effect without biographical specificity." },
+      { name: "Variant C: RAG, Full Bio", desc: "Full system: reminiscence bump + region + life events + culture. Tests whether richer query construction improves over simpler retrieval." }
+    ],
+    challenges: [
+      "Spotify Web API dropped: audio_features() endpoint began returning HTTP 403 errors for new developer apps in late 2024; rate limits hit after ~550 requests, pivoted to MusicBrainz.",
+      "MusicBrainz enforces strict 1 req/sec rate limit, requiring careful throttling and batch saving every 500 records to avoid mid-pipeline data loss.",
+      "MusicBrainz coverage is sparse for non-Western music pre-1970, limiting personalization for some patient profiles."
+    ],
+    experiments: "All 3 variants evaluated on same 8 fictional patient profiles (spanning 4 decades, 2 US regions, diverse cultural backgrounds). Knowledge base, FAISS index, embedding model, generation model, prompt template, and output format held constant. Metrics: (1) Historical plausibility, % of generated songs existing in knowledge base within patient's reminiscence bump window; (2) Biographical precision + cultural appropriateness, 1–5 scale, two independent raters, quadratic-weighted Cohen's kappa; (3) End-to-end latency per variant. Ablation on Variant C: remove one biographical component at a time (region, culture, life events) to identify which dimensions contribute most.",
+    milestoneProgress: "Full data pipeline complete. Billboard Hot 100 (330,087 entries) deduplicated to 29,681 unique songs, filtered to 1950–1990, decade-sampled to 2,381 songs enriched with MusicBrainz metadata; knowledge_base.csv saved to Google Drive and pushed to shared GitHub. 2,381 song chunks embedded using text-embedding-3-small in 24 batches in approximately 14 seconds; embedding matrix (2381, 1536) saved for reuse. FAISS IndexFlatIP index built with L2-normalized embeddings; serialized to songs.index. Retrieval validated: test query ('popular soul and Motown songs in Detroit in the 1960s') returns Martha &amp; The Vandellas, The Miracles, The Temptations. Patient profile schema and GPT-4o query generation module implemented encoding reminiscence bump, geographic, cultural, and life-event targeting. Full profiling-to-retrieval pipeline (profile_to_context) complete. Generation layer implemented: GPT-4o produces ranked 10-song playlist with relevance justifications and 3 caregiver conversation cards. Eight fictional test patient profiles created spanning 4 decades, 2 US regions, and diverse cultural backgrounds.",
+    keyResults: [
+      "FAISS retrieval validated: test query for Detroit Motown 1960s correctly returns Martha & The Vandellas, The Miracles, The Temptations",
+      "2,381 L2-normalized song embeddings (text-embedding-3-small, 1536-dim): 24 batches embedded in ~14 seconds",
+      "Reminiscence bump calculation: birth year +15 to birth year +25 as primary temporal filter",
+      "3 caregiver conversation cards generated per session linking songs to patient's specific life memories"
+    ],
+    techStack: ["GPT-4o", "FAISS", "text-embedding-3-small", "Billboard API", "MusicBrainz API", "Python"],
+    area: "RAG"
+  },
+  {
+    id: "rental-market",
+    title: "Rental Market Intelligence Agent",
+    subtitle: "Multi-Agent Real Estate Research with Live Web Data",
+    type: ["agentic"],
+    primaryType: "agentic",
+    team: ["Alex Endo", "Minkush Jain", "Avery Lee", "Patrick Ruan"],
+    github: "https://github.com/yoonoolee/rental_market_analyzer",
+    description: "A multi-agent DAG via LangGraph where a coordinator dynamically delegates to parallel ReAct listing agents. Each agent uses Firecrawl, SerpAPI, Google Maps, and Claude to build comprehensive apartment profiles in real time.",
+    motivation: "Apartment hunting is fragmented and inefficient. Renters must manually filter listings by price and location, read reviews to infer safety and lifestyle, calculate commute distances, and balance fixed constraints with flexible preferences. Existing platforms provide structured filtering but do not interpret nuanced natural language preferences or synthesize qualitative neighborhood context in a grounded way. Generative AI is appropriate because large language models can interpret complex natural language queries and reason about trade-offs, while retrieval-augmented generation ensures outputs remain grounded in real listings and reviews. An agentic architecture allows the system to decompose complex tasks into subproblems, filtering, neighborhood analysis, and ranking, and execute only the research steps that matter for that specific user and listing.",
+    dataScale: "No static dataset. Data gathered live at runtime. Typical session: 20–40 listing pages scraped via Firecrawl → 10–15 fully profiled apartments after filtering. Each profile contains: price, bedrooms, bathrooms, pet policy, address, photos, listing descriptions, commute times (Distance Matrix API), and nearby amenities (Places API).",
+    architecture: "LangGraph orchestration with Chainlit UI. Pipeline: (1) Conversation Agent (Claude Haiku for preference extraction, Claude Sonnet for follow-up questions) → structured weighted preference profile; (2) Planner Node → multiple Google search queries; (3) Parallel Search Nodes (SerpAPI) → listing URLs; (4) Supervisor Node → spawns one ReAct agent per URL; (5) Parallel ReAct Listing Agents, each agent uses Firecrawl (scrape), SerpAPI (search), Claude Sonnet (photo analysis), Google Places API (nearby amenities), and Distance Matrix API (commute times), iterating via ReAct until profile complete; (6) Results Check → disqualify listings violating hard constraints, retry if <10 results; (7) Reducer Agent → ranks all listings against user preferences; (8) Analyzer Agent → explains patterns across qualified and disqualified listings.",
+    variants: [
+      { name: "Search Result Count", desc: "Compare 3, 5, or 10 results per query measuring valid listing precision, yield rate, and API cost." },
+      { name: "Image Analysis Model", desc: "Claude Sonnet (5 images) vs. Claude Haiku (5 images) vs. Sonnet (3 images) on field accuracy and cost." },
+      { name: "Preference Elicitation", desc: "Different Haiku/Sonnet combinations for extraction vs. question generation, measuring extraction F1 and turns-to-ready." },
+      { name: "Listing Agent Strategy", desc: "Sonnet vs. Haiku, conditional tool selection vs. always-call-all-tools, measuring extraction accuracy and tool call count." }
+    ],
+    challenges: [
+      "Inconsistent listing formats across Zillow, Craigslist, and Apartments.com, Claude-powered LLM extraction avoids per-site rule maintenance.",
+      "Expired or duplicate listings in search results, duplicates filtered at supervisor level before spawning agents.",
+      "Missing fields (square footage, move-in dates): listing agent calls search_web to find missing info elsewhere; hard constraint violations trigger early disqualification to save API costs."
+    ],
+    experiments: "5 experiments: (1) Internet Search, 3/5/10 results per query, measuring precision, latency, and credit usage; (2) Image Analysis, Sonnet vs. Haiku models, field accuracy, consistency, quality, cost; (3) Preference Elicitation, model combinations, extraction F1, turns-to-ready rate; (4) Planner, temperature and few-shot impact on query diversity and format validity; (5) Listing Agent, conditional vs. full tool selection, Sonnet vs. Haiku, measuring extraction accuracy, profile completeness, and cost.",
+    milestoneProgress: "Full multi-agent LangGraph architecture implemented with Chainlit UI. Firecrawl, SerpAPI, and Anthropic API integrations tested. Draft tools implemented: scrape_listing (Firecrawl), search_web (SerpAPI), and analyze_listing_photos (Claude Sonnet). Google Maps Distance Matrix API (get_commute_time) and Places API Nearby Search (find_nearby_places) pipelines in active development, initial integration underway with geocoding step for address-to-coordinate conversion. Parallel ReAct listing agents implemented: each uses ReAct to iteratively select tools based on tool responses. Results Check Node implemented: disqualifies listings violating hard constraints (over budget, no pets), retries until at least 10 listings found. Duplicate URL filtering at supervisor level complete. Evaluation architecture scaffolded for 5 planned experiments.",
+    keyResults: [
+      "Multi-agent DAG pivoted from linear RAG, coordinator dynamically builds per-listing research plans",
+      "ReAct listing agents iteratively select tools based on tool responses at each step",
+      "Hard constraint violations trigger early disqualification, saves API costs across parallel agents",
+      "Analyzer Agent explains patterns: e.g., 'Neighborhood X: ~$2000 / 1 bath; Neighborhood Y: ~$2500 / 2 baths'"
+    ],
+    techStack: ["LangGraph", "Firecrawl", "SerpAPI", "Claude Sonnet", "Claude Haiku", "Google Maps API", "Chainlit"],
+    area: "Agentic AI · Multi-Agent"
+  },
+  {
+    id: "wildfire-simulation",
+    title: "Wildfire Mitigation Simulation",
+    subtitle: "Multi-Agent Simulation of Berkeley Hills Homeowner Behavior",
+    type: ["simulation"],
+    primaryType: "simulation",
+    team: ["Madeleine Melcher", "Amrita Nambiar", "Samuel Robson", "Sanjali Roy"],
+    github: "https://github.com/sanjaliroy/berkeley-homes-wildfire-agent-simulation",
+    description: "Simulates 20 Berkeley Hills homeowners as LLM-powered agents making wildfire preparation decisions. Grounded in 20 real resident interviews and a 6-layer architecture inspired by Park et al.'s Generative Agents.",
+    motivation: "In recent years wildfire destruction has reached catastrophic levels, California alone lost over 41,000 structures between 2018 and 2023. Despite stricter defensible space mandates under AB 3074 and SB 504 and increased agency outreach, a wildfire mitigation compliance gap persists. Homeowners often fail to take even cursory steps toward fire-resilience, leaving communities vulnerable. Understanding the behavioral and social factors deterring homeowners from taking action will allow fire officials, policymakers, and insurers to identify effective interventions. Generative AI is positioned to establish this understanding because it can simulate nuanced, human-like decision-making at scale. By seeding AI agents with insights from interviews with Berkeley Hills homeowners, the project creates synthetic stakeholders that reflect real social contexts, enabling cheap, repeatable testing of policy interventions and communication strategies.",
+    dataScale: "20 semi-structured interviews with Berkeley Hills homeowners (Firewise Community members, Feb–March 2026, ~1hr each, conducted via Zoom and in person). 11 recorded (full transcripts) + 9 note-based. Diverse in gender, education, financial background, and political ideology. Gemini 2.5 Flash used to generate agent personas from transcripts. Berkeley Ember ordinance documents (City of Berkeley, 2026) as intervention source.",
+    architecture: "6-layer simulation architecture: (1) Config Layer, baseline.yaml (scenario parameters, intervention schedule) and agents.yaml (per-agent persona prompt, beliefs, risk zone, institutional trust, seed memories); (2) Engine Layer, tick-loop orchestration (simulation.py, scheduler.py via heapq priority queue); (3) Environment Layer, channels.py wraps events in framing (official_mail, news_media, social, direct_experience); network.py manages agent relationships; (4) Agent Cognition Layer, per-agent perceive→retrieve→decide→act→store cycle. retrieval.py scores memories by recency × importance × relevance; reflection.py 2-step process generates higher-level beliefs with citations; conversation.py runs multi-turn dialogue with both agents' full cognition cycles; (5) Output Layer, JSONL logging of decisions, reasoning, memories, reflections; (6) Evaluation Layer, LLM-as-judge scoring.",
+    variants: [
+      { name: "Ablation V1: Full System", desc: "Memory stream + retrieval + reflection. Complete architecture." },
+      { name: "Ablation V2: No Reflection", desc: "Memory + retrieval only. Removes higher-level belief synthesis." },
+      { name: "Ablation V3: No Memory", desc: "Seed personality only. No memory stream, retrieval, or reflection." },
+      { name: "Model V1: Mixed Config", desc: "Claude Sonnet 4.6 for reflections, Claude Haiku/DeepSeek-R1 for routine decisions. Baseline." },
+      { name: "Model V2: Small Model Only", desc: "Small model for both reflections and routine decisions." },
+      { name: "Model V3: Large Model Only", desc: "Larger model for all operations (budget permitting)." }
+    ],
+    challenges: [
+      "Firewise-sourced sample skews toward compliant homeowners, plan to create synthetic non-compliant agent profiles from proxy data described by interviewees.",
+      "Note-based interview profiles (9 of 20) created conservatively by single team member, two additional teammates will independently code key variables with Cohen's kappa agreement check.",
+      "Social relationship encoding from interviews into network architecture planned but not yet implemented."
+    ],
+    experiments: "LLM-as-judge scores each agent decision on 3 dimensions (1–5 scale): Behavioral Plausibility, Persona Consistency, and Intervention Responsiveness. Experiment 1 (Ablation): compare 3 architectural variants to identify which cognitive components drive behavioral realism. Experiment 2 (Model Comparison): compare mixed-model vs. small-only vs. large-only configurations on decision quality, API cost, and runtime (cost scales quickly: each agent makes multiple LLM calls per tick).",
+    milestoneProgress: "Twenty semi-structured interviews with Berkeley Hills homeowners completed (11 recorded with full transcripts, 9 note-based). Interview transcripts cleaned and filtered to isolate homeowner voice; transcripts over 6,000 words truncated. Gemini 2.5 Flash used to generate all 20 agent personas, capturing institutional trust, compliance status, risk zone, and seed memories; outputs manually cross-checked against transcripts. Intervention schedule (baseline.yaml) finalized with event schema, channel mapping, and sequencing. Baseline single-agent simulation running: one agent (Jennifer) receiving one intervention through the full perceive → retrieve → decide → act → store cognition cycle. Agent config (jennifer.yaml), LLM client (client.py), and prompt assembly (prompts.py) built. Memory stream implementation complete (memory.py). Full 6-layer simulation architecture designed and partially implemented: Config, Engine, Environment, Agent Cognition, Output, and Evaluation layers.",
+    keyResults: [
+      "20 interview-grounded agent personas with institutional trust, compliance status, risk zone, and seed memories",
+      "Perceive→retrieve→decide→act→store cognitive cycle with recency×importance×relevance memory scoring",
+      "2-step reflection process generates cited higher-level beliefs stored as first-class memories",
+      "Multi-turn agent conversations trigger interrupt ticks, both agents' full cognition cycles run per utterance"
+    ],
+    techStack: ["LangGraph", "Gemini 2.5 Flash", "Claude Sonnet 4.6", "Claude Haiku", "DeepSeek-R1", "Python", "YAML"],
+    area: "Multi-Agent Simulation"
+  },
+  {
+    id: "macromind",
+    title: "MacroMind",
+    subtitle: "RAG-Powered Nutrition Tracking with Constraint-Aware Meal Planning",
+    type: ["rag", "multimodal"],
+    primaryType: "rag",
+    team: ["Jyoti Divya", "Pan Haoming", "Lin Iyu", "Baier Noah"],
+    github: "https://github.com/divyajyoti-dev/MacroMind",
+    description: "A constraint-aware RAG system with multi-objective reranking. V3 achieves +63% Precision@5 vs. V2 RAG-only and 100% budget adherence across all test profiles. Deployed as a Streamlit web app.",
+    motivation: "Proper nutritional management is fragmented across calorie trackers, grocery apps, and manual logging, leading to wasted food, overspending, and missed health goals. MacroMind unifies macro-aware meal recommendation, grocery planning, and fridge inventory tracking into a single system. Using a multimodal RAG architecture, it retrieves recipes from datasets such as RecipeNLG, nutritional information from USDA FoodData Central, and pricing data from publicly available grocery APIs. The system then reasons under macro, budget, and dietary constraints to generate personalized recommendations. The system is designed for health-conscious individuals and budget-aware households seeking explainable, constraint-aware nutrition guidance rather than static meal plans.",
+    dataScale: "RecipeNLG dataset: 2,231,142 recipes (using 'Gathered' subset ~1.6M for quality). Current working corpus: 65 recipes; scaling to full RecipeNLG is the top priority. USDA FoodData Central: 463,000 food entries (Foundation: 365, SR Legacy: 7,793, Branded: 454,678). Embedding model: all-MiniLM-L6-v2 (384-dim, CPU-only) stored in ChromaDB.",
+    architecture: "4-stage constraint-aware RAG pipeline: (1) Query Construction, user constraints (macros, budget, pantry, dietary tags) serialized into a natural-language semantic search string; (2) Retrieval, ChromaDB collection queried via cosine similarity, top-20 candidates returned; (3) Constraint-Aware Reranking, candidates rescored as score = 1 − (0.50×MAPE + 0.30×budget_overshoot + 0.20×waste_fraction), with −999 hard penalty for dietary tag violations, top-5 selected; (4) LLM Generation, Gemini 2.0 Flash or Groq Llama 3.3 70B prompted with constraints + top-5 recipe cards to produce a full-day meal plan with macro totals and per-meal rationale. Streamlit UI wraps full pipeline with live variant switching and side-by-side recipe card inspection.",
+    variants: [
+      { name: "V1: Baseline LLM", desc: "No retrieval. LLM parametric knowledge only. Establishes baseline." },
+      { name: "V2: Standard RAG", desc: "Semantic top-5 retrieval from ChromaDB. Grounding benefit alone." },
+      { name: "V3: RAG + Reranking", desc: "Semantic top-20 → constraint-aware reranking to top-5. Full constraint-optimized pipeline." }
+    ],
+    challenges: [
+      "RecipeNLG and USDA use different naming conventions ('brown sugar' vs. 'Sugars, brown'): USDA lookup uses token overlap + metadata scoring.",
+      "Nutritional values provided per 100g while recipe ingredients use inconsistent units ('1 cup', '250 ml'): custom quantity/unit parser built.",
+      "65-recipe working corpus too small: for standard profiles, reranking reorders by budget/waste fit rather than macro proximity, scaling to full RecipeNLG corpus is top priority."
+    ],
+    experiments: "V2 vs. V3 evaluated across 5 user profiles: Body Recomp (2000 kcal/$12), Muscle Bulk (2800 kcal/$16), Vegetarian Weight Loss (1600 kcal/$9), Budget Meal Prep (1900 kcal/$7), Keto/Low Carb (1800 kcal, 30g carbs/$14). 6 ground-truth relevant recipes manually annotated per profile. Metrics: macro MAPE (lower is better), Precision@5 (higher is better), budget adherence (binary). All variants achieve 100% budget adherence. Planned: LLM-as-judge macro extraction for V1 evaluation and user acceptability study.",
+    milestoneProgress: "V3 (RAG + Reranking) pipeline complete and evaluated across 5 user profiles. RAG+Reranking improves mean Precision@5 by 63% (0.32 → 0.52). The keto hard-penalty reduces macro deviation from 113% to 40% by eliminating non-keto candidates that semantic search surfaces. For standard profiles (Body Recomp, Vegetarian), reranking reorders by budget and waste fit rather than macro proximity, which confirms that corpus size is the primary bottleneck, scaling to the full RecipeNLG corpus is the top priority. All variants achieve 100% budget adherence across all 5 test cases. Streamlit UI deployed with live variant switching, on-demand corpus ingestion, and side-by-side recipe card inspection.",
+    keyResults: [
+      "V3 RAG + Reranking: Precision@5 = 0.52 vs. V2's 0.32 (+63%)",
+      "Keto hard-penalty eliminates non-keto candidates: macro deviation drops from 113% → 40%",
+      "100% budget adherence across all 5 test profiles and both variants",
+      "Constraint reranker score = 1 − (0.50×MAPE + 0.30×budget_overshoot + 0.20×waste_fraction)"
+    ],
+    techStack: ["ChromaDB", "all-MiniLM-L6-v2", "Gemini 2.0 Flash", "Llama 3.3 70B", "RecipeNLG", "USDA FoodData", "Streamlit"],
+    area: "RAG · Multimodal"
+  },
+  {
+    id: "automated-librarian",
+    title: "Automated Librarian",
+    subtitle: "5-Modality RAG System for Universal Document Intelligence",
+    type: ["rag", "multimodal"],
+    primaryType: "rag",
+    team: ["Michael Herrington", "Shuai Meng", "Victor Ngetich", "Kevin Skinner"],
+    github: "https://github.com/Kevin-Skinner/automated-librarian",
+    notebook: "https://colab.research.google.com/drive/1k7_OHlg-Id2d1B6bTC6i7NBN_Y9k4uKz?usp=sharing",
+    description: "A universal document intelligence system that ingests 5 modalities (web pages, PDFs, images, plain text, and video) into ChromaDB via a 12-step agentic pipeline, benchmarking GPT-5.4 vs. Llama 3.2 vs. Qwen2.5-7B across RAG top-K retrieval variants.",
+    motivation: "Knowledge is fragmented across formats. A researcher's insights live in PDFs, web articles, images, video recordings, and plain notes, yet most personal knowledge tools handle only one or two of these. The Automated Librarian treats all five modalities as first-class citizens, building a unified personal knowledge base that ingests anything and makes it instantly retrievable. Rather than manual tagging or folder organization, the system uses a 12-step agentic pipeline to automatically summarize, title, tag, categorize, and merge new content with existing notes, so the knowledge base grows intelligently with every new input.",
+    dataScale: "User-specific data, no fixed training corpus. 5 modalities supported: web URLs, PDFs, images, plain text, and videos. Evaluation uses a 27-item test corpus (18 plain text, 5 web, 4 PDF). ChromaDB serves as the unified vector store for all ingested content.",
+    architecture: "CLI → RouterAgent → preprocessing → LLM chain → ChromaDB knowledge base. 12-step agentic pipeline: (1) Route, RouterAgent detects input type (URL, PDF, image, text, video); (2) Extract, clean text + metadata per modality; (3) Summarize, LLM #1 produces 3–10 sentence summary; (4) Title, LLM #2 generates a title ≤10 words; (5) Tag, LLM #3 outputs 3–7 topical tags as JSON; (6) Categorize, LLM #4 picks an existing folder or creates a new one; (7) RAG Query, VectorStore retrieves top-K similar existing notes; (8) Merge Decision, LLM #5 decides whether to create a new note or append to an existing one; (9) Format, LLM #6 produces structured markdown; (10) Save, FileManager writes to knowledge_store/&lt;category&gt;/&lt;title&gt;.md; (11) Index, VectorStore upserts document to ChromaDB; (12) Return, CLI displays result.",
+    variants: [
+      { name: "GPT-5.4 Provider", desc: "OpenAI GPT-5.4 for all 6 LLM steps. Highest quality baseline; evaluated on summary quality, title accuracy, tag relevance, and merge decision correctness." },
+      { name: "Llama 3.2 via Ollama", desc: "Local Llama 3.2 served via Ollama. Fully offline; evaluated on same 4 dimensions vs. GPT-4o." },
+      { name: "Qwen2.5-7B via Ollama", desc: "Local Qwen2.5-7B served via Ollama. Lightweight alternative in the LLM provider comparison." },
+      { name: "RAG Top-K = 5", desc: "Retrieve 5 similar existing notes as context for the merge decision step." },
+      { name: "RAG Top-K = 10 / 15 / 20", desc: "Broader retrieval windows; evaluates whether more context improves or degrades merge decision quality and at what cost." }
+    ],
+    challenges: [
+      "Context bleeding across LLM calls: outputs from early pipeline steps leaked into later prompts, causing downstream errors, fixed by explicitly resetting prompt context between each of the 6 sequential LLM calls.",
+      "JavaScript-rendered pages return no usable text via standard HTTP scraping, exploring Playwright as a headless browser fallback for dynamic content extraction."
+    ],
+    experiments: "Experiment 1, LLM Provider Comparison: human evaluation + LLM-as-judge scoring across 4 output dimensions (summary quality, title accuracy, tag relevance, merge decision correctness) for GPT-5.4 vs. Llama 3.2 vs. Qwen2.5-7B on the 27-item test corpus. Experiment 2, RAG Top-K Comparison: evaluate merge decision quality at K=5, 10, 15, and 20 to find the optimal retrieval window, measuring decision accuracy and API cost per document.",
+    milestoneProgress: "During development and testing, we worked with inputs across all five supported modalities: web URLs, PDF files, images, plain text, and videos. All preprocessing pipelines implemented: BeautifulSoup for web content, PyPDF2 for PDFs, Pillow + Tesseract OCR for images, yt-dlp for video transcripts, and whitespace normalization for plain text. Full 12-step agentic pipeline implemented end-to-end. ChromaDB vector store operational with cosine similarity threshold of 0.4. Two issues encountered and addressed: context bleeding across sequential LLM calls fixed by resetting prompt context between pipeline runs; JavaScript-rendered pages returning no usable text, evaluating Playwright as headless browser fallback. Ollama integration for local models (Llama 3.2, Qwen2.5-7B-Instruct) complete. GPT-5.4 vs. Llama 3.2 vs. Qwen2.5-7B benchmarking underway on 27-item test corpus across Top-K variants.",
+    keyResults: [
+      "12-step agentic pipeline: Route → Extract → Summarize → Title → Tag → Categorize → RAG → Merge → Format → Save → Index → Return",
+      "5 ingestion modalities as first-class citizens: web URLs, PDFs, images, plain text, video",
+      "6 sequential LLM calls with prompt context reset between steps to prevent bleeding",
+      "LLM provider benchmark: GPT-5.4 vs. Llama 3.2 vs. Qwen2.5-7B on 27-item test corpus"
+    ],
+    techStack: ["ChromaDB", "GPT-5.4", "Llama 3.2", "Qwen2.5-7B", "Ollama", "BeautifulSoup", "PyPDF2", "Tesseract OCR", "yt-dlp", "Python"],
+    area: "RAG · Multimodal"
+  }
+];
+
+// ─────────────────────────────────────────────────────────────────
+//  BADGE & TYPE HELPERS
+// ─────────────────────────────────────────────────────────────────
+const TYPE_BADGE = {
+  agentic:    { cls: "badge-agentic",    label: "Agentic AI" },
+  rag:        { cls: "badge-rag",        label: "RAG" },
+  finetune:   { cls: "badge-finetune",   label: "Fine-tuning / RL" },
+  simulation: { cls: "badge-simulation", label: "Simulation" },
+  multimodal: { cls: "badge-multimodal", label: "Multimodal" },
+};
+
+function badgeHTML(type) {
+  const b = TYPE_BADGE[type] || { cls: "badge-mixed", label: type };
+  return `<span class="type-badge ${b.cls}">${b.label}</span>`;
+}
+
+function initials(name) {
+  return name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+}
+
+// ─────────────────────────────────────────────────────────────────
+//  RENDER CARD
+// ─────────────────────────────────────────────────────────────────
+function renderCard(p) {
+  const teamStr = p.team.join(", ");
+  const techChips = p.techStack.slice(0, 4).map(t => `<span class="tech-chip">${t}</span>`).join("");
+  return `
+    <div class="card" data-id="${p.id}" tabindex="0" role="button" aria-label="View ${p.title} details">
+      <div class="card-banner-wrap">
+        <img class="card-banner" src="https://api.dicebear.com/9.x/shapes/svg?seed=${p.id}&backgroundColor=003262,1d4a8a,0f5499&backgroundType=gradientLinear&scale=120" alt="" loading="lazy">
+      </div>
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-header">
+          <div class="card-title">${p.title}</div>
+          ${badgeHTML(p.primaryType)}
+        </div>
+        <p class="card-desc">${p.description}</p>
+        <div class="card-team">${teamStr}</div>
+
+        <div class="tech-chips">${techChips}${p.techStack.length > 4 ? `<span class="tech-chip">+${p.techStack.length - 4} more</span>` : ""}</div>
+      </div>
+      <div class="card-footer">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        View Details
+      </div>
+    </div>`;
+}
+
+// ─────────────────────────────────────────────────────────────────
+//  RENDER MODAL
+// ─────────────────────────────────────────────────────────────────
+function renderModal(p) {
+  document.getElementById("modalHeroBanner").src = `https://api.dicebear.com/9.x/shapes/svg?seed=${p.id}&backgroundColor=003262,1d4a8a,0f5499&backgroundType=gradientLinear&scale=120`;
+  document.getElementById("modalTitle").innerHTML = p.title;
+  document.getElementById("modalSubtitle").textContent = p.subtitle;
+  document.getElementById("modalMeta").innerHTML = `
+    <div class="modal-meta-item">
+      ${badgeHTML(p.primaryType)}
+    </div>
+    <div class="modal-meta-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      ${p.team.length} team members
+    </div>
+    <div class="modal-meta-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      ${p.area}
+    </div>`;
+
+  const teamHTML = p.team.map(name => `
+    <div class="team-member">
+      <div class="team-avatar">${initials(name)}</div>
+      ${name}
+    </div>`).join("");
+
+  const techHTML = p.techStack.map(t => `<span class="tech-pill">${t}</span>`).join("");
+
+  const highlightsHTML = p.keyResults.map(r => `<div class="highlight-item">${r}</div>`).join("");
+
+  let linksHTML = "";
+  if (p.github) {
+    linksHTML += `<a class="link-btn link-btn-primary" href="${p.github}" target="_blank" rel="noopener">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+      GitHub Repository
+    </a>`;
+  }
+  if (p.notebook) {
+    linksHTML += `<a class="link-btn link-btn-secondary" href="${p.notebook}" target="_blank" rel="noopener">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      Jupyter Notebook
+    </a>`;
+  }
+  if (p.driveLink) {
+    linksHTML += `<a class="link-btn link-btn-secondary" href="${p.driveLink}" target="_blank" rel="noopener">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      Google Drive
+    </a>`;
+  }
+  if (!p.github && !p.driveLink && !p.notebook) {
+    linksHTML = `<span style="font-size:.82rem;color:var(--muted)">Repository link coming soon</span>`;
+  }
+
+  const dataScaleHTML = p.dataScale ? `
+    <div class="section">
+      <div class="section-title">Data &amp; Scale</div>
+      <p>${p.dataScale}</p>
+    </div>` : "";
+
+  const architectureHTML = p.architecture ? `
+    <div class="section">
+      <div class="section-title">System Architecture</div>
+      <p>${p.architecture}</p>
+    </div>` : "";
+
+  const variantsHTML = p.variants && p.variants.length ? `
+    <div class="section">
+      <div class="section-title">System Variants</div>
+      <div class="variants-list">${p.variants.map(v => `
+        <div class="variant-item"><span class="variant-name">${v.name}</span>, ${v.desc}</div>`).join("")}
+      </div>
+    </div>` : "";
+
+  const challengesHTML = p.challenges && p.challenges.length ? `
+    <div class="section">
+      <div class="section-title">Engineering Challenges</div>
+      <div class="challenges-list">${p.challenges.map(c => `<div class="challenge-item">${c}</div>`).join("")}</div>
+    </div>` : "";
+
+  const experimentsHTML = p.experiments ? `
+    <div class="section">
+      <div class="section-title">Experiments &amp; Evaluation</div>
+      <p>${p.experiments}</p>
+    </div>` : "";
+
+  document.getElementById("modalBody").innerHTML = `
+    <div class="section">
+      <div class="section-title">Motivation</div>
+      <p>${p.motivation}</p>
+    </div>
+    ${dataScaleHTML}
+    ${architectureHTML}
+    ${variantsHTML}
+    ${challengesHTML}
+    ${experimentsHTML}
+    <div class="section">
+      <div class="section-title">Milestone Progress</div>
+      <p>${p.milestoneProgress}</p>
+    </div>
+    <div class="section">
+      <div class="section-title">Key Results &amp; Highlights</div>
+      <div class="highlight-grid">${highlightsHTML}</div>
+    </div>
+    <div class="section">
+      <div class="section-title">Technology Stack</div>
+      <div class="tech-stack">${techHTML}</div>
+    </div>
+    <div class="section">
+      <div class="section-title">Team Members</div>
+      <div class="team-grid">${teamHTML}</div>
+    </div>
+    <div class="section">
+      <div class="section-title">Links</div>
+      <div class="modal-links">${linksHTML}</div>
+    </div>`;
+}
+
+// ─────────────────────────────────────────────────────────────────
+//  FILTER + SEARCH STATE
+// ─────────────────────────────────────────────────────────────────
+function getVisible() {
+  return PROJECTS;
+}
+
+function renderGrid() {
+  const visible = getVisible();
+  const grid = document.getElementById("projectGrid");
+
+  if (visible.length === 0) {
+    grid.innerHTML = `
+      <div class="no-results">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <h3>No projects found</h3>
+        <p>Try adjusting your search or filter.</p>
+      </div>`;
+    return;
+  }
+  grid.innerHTML = visible.map(renderCard).join("");
+
+  // attach click + keyboard
+  grid.querySelectorAll(".card").forEach(el => {
+    const open = () => openModal(el.dataset.id);
+    el.addEventListener("click", open);
+    el.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } });
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────
+//  MODAL OPEN / CLOSE
+// ─────────────────────────────────────────────────────────────────
+function openModal(id) {
+  const p = PROJECTS.find(p => p.id === id);
+  if (!p) return;
+  renderModal(p);
+  document.getElementById("overlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+  window.location.hash = id;
+  document.getElementById("modal").focus();
+}
+
+function closeModal() {
+  document.getElementById("overlay").classList.remove("open");
+  document.body.style.overflow = "";
+  history.pushState("", document.title, window.location.pathname + window.location.search);
+}
+
+// ─────────────────────────────────────────────────────────────────
+//  EVENT LISTENERS
+// ─────────────────────────────────────────────────────────────────
+document.getElementById("modalClose").addEventListener("click", closeModal);
+document.getElementById("overlay").addEventListener("click", e => {
+  if (e.target === document.getElementById("overlay")) closeModal();
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") closeModal();
+});
+
+
+// hash routing on load
+window.addEventListener("hashchange", () => {
+  const id = window.location.hash.slice(1);
+  if (id) openModal(id);
+  else closeModal();
+});
+
+// ─────────────────────────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────────────────────────
+renderGrid();
+
+// check hash on page load
+const initialHash = window.location.hash.slice(1);
+if (initialHash && PROJECTS.find(p => p.id === initialHash)) {
+  openModal(initialHash);
+}
+</script>
+</body>
+</html>
