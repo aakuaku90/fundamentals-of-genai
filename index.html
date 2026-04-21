@@ -37,10 +37,16 @@
       color: #fff;
       position: relative;
       overflow: hidden;
-      min-height: 92vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
+    }
+
+    /* Only flex-center on desktop where the hero is the viewport-height intro. */
+    @media (min-width: 1120px) {
+      .hero {
+        min-height: 92vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
     }
 
     .hero-bg {
@@ -74,12 +80,13 @@
 
     .hero-text { min-width: 0; }
 
-    /* ── HERO DECK (right) — driven by Swiper ── */
+    /* ── HERO DECK — driven by Swiper ──
+       Sits below the hero copy on narrow screens; moves to the right on ≥1120px. */
     .hero-deck {
-      width: 380px;
-      height: 460px;
-      justify-self: end;
-      display: none; /* revealed at ≥1080px */
+      width: 100%;
+      max-width: 340px;
+      height: 420px;
+      justify-self: center;
       overflow: visible; /* let the trailing card's rotation bleed out */
     }
 
@@ -200,10 +207,14 @@
 
     @media (min-width: 1120px) {
       .hero-inner {
-        grid-template-columns: minmax(0, 1fr) 400px;
+        grid-template-columns: minmax(0, 1fr) 380px;
         gap: 56px;
       }
-      .hero-deck { display: block; }
+      .hero-deck {
+        max-width: 380px;
+        height: 460px;
+        justify-self: end;
+      }
     }
 
     .hero-eyebrow {
@@ -525,11 +536,31 @@
 
     /* ── RESPONSIVE ── */
     @media (max-width: 640px) {
-      .hero-inner { padding: 60px 24px 72px; }
+      .hero-inner { padding: 60px 24px 140px; } /* extra bottom so fixed stats-bar doesn't cover the deck */
       .section { padding: 52px 24px; }
       .stats-inner { padding: 0 24px; }
       .cta-inner { padding: 52px 24px; }
       .stat-item { min-width: 80px; }
+
+      /* Stack event cards full-width on mobile */
+      .hero-event { flex-direction: column; gap: 12px; }
+      .event-card { width: 100%; }
+
+      /* Scroll the stats bar horizontally instead of wrapping */
+      .stats-inner {
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .stats-inner::-webkit-scrollbar { display: none; }
+      .stat-item {
+        flex: 0 0 auto;
+        min-width: auto;
+        padding: 18px 22px;
+      }
     }
   </style>
 </head>
@@ -791,6 +822,8 @@
     grabCursor: true,
     loop: true,
     speed: 700,
+    observer: true,
+    observeParents: true,
     cardsEffect: {
       slideShadows: false,
       perSlideOffset: 9,
