@@ -865,6 +865,7 @@ const PROJECTS = [
     subtitle: "Multi-Agent Simulation of Berkeley Hills Homeowner Behavior",
     type: ["simulation"],
     primaryType: "simulation",
+    bannerImage: "images/wildfire-simulation.png",
     team: ["Madeleine Melcher", "Amrita Nambiar", "Samuel Robson", "Sanjali Roy"],
     github: "https://github.com/sanjaliroy/berkeley-homes-wildfire-agent-simulation",
     description: "Simulates 20 Berkeley Hills homeowners as LLM-powered agents making wildfire preparation decisions. Grounded in 20 real resident interviews and a 6-layer architecture inspired by Park et al.'s Generative Agents.",
@@ -991,10 +992,11 @@ function initials(name) {
 function renderCard(p) {
   const teamStr = p.team.join(", ");
   const techChips = p.techStack.slice(0, 4).map(t => `<span class="tech-chip">${t}</span>`).join("");
+  const bannerSrc = p.bannerImage || `https://api.dicebear.com/9.x/shapes/svg?seed=${p.id}&backgroundColor=003262,1d4a8a,0f5499&backgroundType=gradientLinear&scale=120`;
   return `
     <div class="card" data-id="${p.id}" tabindex="0" role="button" aria-label="View ${p.title} details">
       <div class="card-banner-wrap">
-        <img class="card-banner" src="https://api.dicebear.com/9.x/shapes/svg?seed=${p.id}&backgroundColor=003262,1d4a8a,0f5499&backgroundType=gradientLinear&scale=120" alt="" loading="lazy">
+        <img class="card-banner" src="${bannerSrc}" alt="" loading="lazy">
       </div>
       <div class="card-accent"></div>
       <div class="card-body">
@@ -1018,7 +1020,7 @@ function renderCard(p) {
 //  RENDER MODAL
 // ─────────────────────────────────────────────────────────────────
 function renderModal(p) {
-  document.getElementById("modalHeroBanner").src = `https://api.dicebear.com/9.x/shapes/svg?seed=${p.id}&backgroundColor=003262,1d4a8a,0f5499&backgroundType=gradientLinear&scale=120`;
+  document.getElementById("modalHeroBanner").src = p.bannerImage || `https://api.dicebear.com/9.x/shapes/svg?seed=${p.id}&backgroundColor=003262,1d4a8a,0f5499&backgroundType=gradientLinear&scale=120`;
   document.getElementById("modalTitle").innerHTML = p.title;
   document.getElementById("modalSubtitle").textContent = p.subtitle;
   document.getElementById("modalMeta").innerHTML = `

@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>INFO 290: Final Project Showcase — Spring 2026</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -55,16 +56,154 @@
       position: absolute;
       inset: 0;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23n)'/%3E%3C/svg%3E");
-      opacity: .10;
+      opacity: .22;
       mix-blend-mode: overlay;
       pointer-events: none;
     }
 
     .hero-inner {
       position: relative;
-      max-width: 900px;
+      max-width: 1240px;
       margin: 0 auto;
       padding: 80px 40px 140px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .hero-text { min-width: 0; }
+
+    /* ── HERO DECK (right) — driven by Swiper ── */
+    .hero-deck {
+      width: 380px;
+      height: 460px;
+      justify-self: end;
+      display: none; /* revealed at ≥1080px */
+      overflow: visible; /* let the trailing card's rotation bleed out */
+    }
+
+    .hero-deck .swiper-wrapper { align-items: center; }
+
+    /* Each card = one Swiper slide */
+    .deck-card {
+      border-radius: 22px;
+      padding: 28px 28px 24px;
+      background: linear-gradient(150deg, #1d4a8a 0%, #003262 55%, #061a33 100%);
+      border: 1px solid rgba(253,181,21,.22);
+      box-shadow:
+        0 40px 80px -24px rgba(0,0,0,.6),
+        0 0 0 1px rgba(255,255,255,.04) inset,
+        0 1px 0 rgba(255,255,255,.08) inset;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    /* Coarse noise — big grain, prominent */
+    .deck-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='320' height='320' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: .35;
+      mix-blend-mode: overlay;
+      pointer-events: none;
+    }
+
+    /* Fine noise — tight grain, adds paper-like grit */
+    .deck-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: .22;
+      mix-blend-mode: soft-light;
+      pointer-events: none;
+    }
+
+
+    .deck-type {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      align-self: flex-start;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: rgba(253,181,21,.12);
+      border: 1px solid rgba(253,181,21,.35);
+      padding: 5px 12px;
+      border-radius: 100px;
+    }
+
+    .deck-title {
+      font-size: 1.85rem;
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -.02em;
+      margin-top: 16px;
+    }
+
+    .deck-sub {
+      font-size: .92rem;
+      line-height: 1.5;
+      color: rgba(255,255,255,.75);
+      margin-top: 12px;
+    }
+
+    .deck-team {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,.1);
+      font-size: .78rem;
+      font-weight: 500;
+      color: rgba(255,255,255,.6);
+      line-height: 1.5;
+    }
+
+    .deck-team-label {
+      display: block;
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.35);
+      margin-bottom: 4px;
+    }
+
+    .deck-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: .78rem;
+      font-weight: 600;
+      color: rgba(255,255,255,.6);
+      letter-spacing: .04em;
+      margin-top: 14px;
+    }
+
+    .deck-foot-arrow {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--gold);
+      color: var(--blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @media (min-width: 1120px) {
+      .hero-inner {
+        grid-template-columns: minmax(0, 1fr) 400px;
+        gap: 56px;
+      }
+      .hero-deck { display: block; }
     }
 
     .hero-eyebrow {
@@ -206,9 +345,21 @@
       color: var(--blue);
       z-index: 100;
       box-shadow: 0 -4px 24px rgba(0,0,0,.12);
+      overflow: hidden;
+    }
+
+    .stats-bar::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: .18;
+      mix-blend-mode: multiply;
+      pointer-events: none;
     }
 
     .stats-inner {
+      position: relative;
       max-width: 900px;
       margin: 0 auto;
       padding: 0 40px;
@@ -389,6 +540,7 @@
   <img class="hero-bg" src="https://api.dicebear.com/9.x/shapes/svg?seed=info290-spring2026&backgroundColor=003262,1d4a8a,0f5499&backgroundType=gradientLinear&scale=150" alt="">
   <div class="hero-noise"></div>
   <div class="hero-inner">
+   <div class="hero-text">
     <h1>Final Project<br><span>Showcase</span></h1>
     <p class="hero-course">INFO 290: Fundamentals of Generative AI &nbsp;·&nbsp; Spring 2026</p>
 
@@ -428,6 +580,191 @@
         Browse All Projects
       </a>
     </div>
+   </div>
+
+   <div class="hero-deck swiper" aria-hidden="true">
+    <div class="swiper-wrapper">
+     <div class="deck-card swiper-slide">
+       <div>
+         <span class="deck-type">Agentic · Multimodal</span>
+         <div class="deck-title">VisionCart</div>
+         <div class="deck-sub">A 4-agent LangGraph pipeline that turns a Pinterest-style vision board into ranked, live product results from real retailers.</div>
+         <div class="deck-team"><span class="deck-team-label">Team</span>Kurumi Kaneko · Quinton King · Raras Pramudita · Lance Santana</div>
+       </div>
+       <div class="deck-foot">
+         <span>01 / 12</span>
+         <span class="deck-foot-arrow">
+           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+         </span>
+       </div>
+     </div>
+
+     <div class="deck-card swiper-slide">
+       <div>
+         <span class="deck-type">RAG · Healthcare</span>
+         <div class="deck-title">Music &amp; Memory</div>
+         <div class="deck-sub">Builds therapeutic playlists for dementia patients by grounding retrieval in the reminiscence bump, region, and life events.</div>
+         <div class="deck-team"><span class="deck-team-label">Team</span>Anika Bhagavatula · Sunny Lee · Mabel Teo · Sejin Kim</div>
+       </div>
+       <div class="deck-foot">
+         <span>02 / 12</span>
+         <span class="deck-foot-arrow">
+           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+         </span>
+       </div>
+     </div>
+
+     <div class="deck-card swiper-slide">
+       <div>
+         <span class="deck-type">Fine-Tuning · RL</span>
+         <div class="deck-title">Sub-3B Function-Calling SLMs</div>
+         <div class="deck-sub">Teaches small language models to reliably call APIs through SFT with function masking, GRPO, and easy-to-hard curriculum learning.</div>
+         <div class="deck-team"><span class="deck-team-label">Team</span>Arnur Sabet · Assel Sakenkyzy · Diara Bagayeva · Meruyert Tastybay</div>
+       </div>
+       <div class="deck-foot">
+         <span>03 / 12</span>
+         <span class="deck-foot-arrow">
+           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+         </span>
+       </div>
+     </div>
+
+     <div class="deck-card swiper-slide">
+       <div>
+         <span class="deck-type">Simulation · Policy</span>
+         <div class="deck-title">Wildfire Mitigation</div>
+         <div class="deck-sub">Agent-based simulation of Berkeley Hills homeowners deciding whether to harden their properties under shifting fire-risk policy.</div>
+         <div class="deck-team"><span class="deck-team-label">Team</span>Madeleine Melcher · Amrita Nambiar · Samuel Robson · Sanjali Roy</div>
+       </div>
+       <div class="deck-foot">
+         <span>04 / 12</span>
+         <span class="deck-foot-arrow">
+           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+         </span>
+       </div>
+     </div>
+
+     <div class="deck-card swiper-slide">
+       <div>
+         <span class="deck-type">Agentic · Accessibility</span>
+         <div class="deck-title">Neuro-Orchestrator</div>
+         <div class="deck-sub">Personalized AI coaching for AuDHD users — task decomposition and reminders shaped by prior plans and neurodivergent-focused prompting.</div>
+         <div class="deck-team"><span class="deck-team-label">Team</span>Delvin Marimo · James Ning · Jaime Wong · Monica Zhao</div>
+       </div>
+       <div class="deck-foot">
+         <span>05 / 12</span>
+         <span class="deck-foot-arrow">
+           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+         </span>
+       </div>
+     </div>
+
+     <div class="deck-card swiper-slide">
+       <div>
+         <span class="deck-type">Agentic · Dialog</span>
+         <div class="deck-title">Belly Button</div>
+         <div class="deck-sub">A real-time conversational recommender that fuses live restaurant data with community sentiment to rank suggestions on the fly.</div>
+         <div class="deck-team"><span class="deck-team-label">Team</span>Supakarn Bunlert · Gyuyeon Stella Jung · Jessie Deng · Tubal Theodros</div>
+       </div>
+       <div class="deck-foot">
+         <span>06 / 12</span>
+         <span class="deck-foot-arrow">
+           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+         </span>
+       </div>
+     </div>
+
+     <div class="deck-card swiper-slide">
+       <div>
+         <span class="deck-type">RAG · Creative</span>
+         <div class="deck-title">Marketing Asset Gen</div>
+         <div class="deck-sub">Generates film marketing taglines and poster art grounded in TMDB retrieval and sharpened by an LLM-as-Judge refinement loop.</div>
+         <div class="deck-team"><span class="deck-team-label">Team</span>Ryuichi Ikeda · Priya Charagondla · Shivani Parikh · Nseke Ngilbus · Lena Ehrenreich</div>
+       </div>
+       <div class="deck-foot">
+         <span>07 / 12</span>
+         <span class="deck-foot-arrow">
+           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+         </span>
+       </div>
+     </div>
+
+     <div class="deck-card swiper-slide">
+       <div>
+         <span class="deck-type">RAG · Research</span>
+         <div class="deck-title">UX Research RAG</div>
+         <div class="deck-sub">Turns raw interview transcripts into traceable user stories and pain points, comparing ChromaDB vs. FAISS retrieval on the same corpus.</div>
+         <div class="deck-team"><span class="deck-team-label">Team</span>Azad Jagtap · Vinay Thorat · Romit Kar · Arno Demarteau</div>
+       </div>
+       <div class="deck-foot">
+         <span>08 / 12</span>
+         <span class="deck-foot-arrow">
+           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+         </span>
+       </div>
+     </div>
+
+     <div class="deck-card swiper-slide">
+       <div>
+         <span class="deck-type">RAG · Legal</span>
+         <div class="deck-title">LawLLM</div>
+         <div class="deck-sub">A copyright-law research assistant that pits a FAISS-backed RAG pipeline against in-context case briefs — with human evaluation on both.</div>
+         <div class="deck-team"><span class="deck-team-label">Team</span>Sarah Algashgari · June Fang · Michelle Lin · Wendi Zheng</div>
+       </div>
+       <div class="deck-foot">
+         <span>09 / 12</span>
+         <span class="deck-foot-arrow">
+           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+         </span>
+       </div>
+     </div>
+
+     <div class="deck-card swiper-slide">
+       <div>
+         <span class="deck-type">Agentic · Real Estate</span>
+         <div class="deck-title">Rental Market Intel</div>
+         <div class="deck-sub">A multi-agent researcher that scrapes live listings, cross-references market signals, and synthesizes investor-ready rental intelligence.</div>
+         <div class="deck-team"><span class="deck-team-label">Team</span>Alex Endo · Minkush Jain · Avery Lee · Patrick Ruan</div>
+       </div>
+       <div class="deck-foot">
+         <span>10 / 12</span>
+         <span class="deck-foot-arrow">
+           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+         </span>
+       </div>
+     </div>
+
+     <div class="deck-card swiper-slide">
+       <div>
+         <span class="deck-type">RAG · Health</span>
+         <div class="deck-title">MacroMind</div>
+         <div class="deck-sub">Nutrition tracking plus constraint-aware meal planning — respects macros, allergies, and pantry state when suggesting what to eat next.</div>
+         <div class="deck-team"><span class="deck-team-label">Team</span>Jyoti Divya · Pan Haoming · Lin Iyu · Baier Noah</div>
+       </div>
+       <div class="deck-foot">
+         <span>11 / 12</span>
+         <span class="deck-foot-arrow">
+           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+         </span>
+       </div>
+     </div>
+
+     <div class="deck-card swiper-slide">
+       <div>
+         <span class="deck-type">RAG · Documents</span>
+         <div class="deck-title">Automated Librarian</div>
+         <div class="deck-sub">A 5-modality RAG system — text, tables, images, audio, and video — unified so users can query any document type with one question.</div>
+         <div class="deck-team"><span class="deck-team-label">Team</span>Michael Herrington · Shuai Meng · Victor Ngetich · Kevin Skinner</div>
+       </div>
+       <div class="deck-foot">
+         <span>12 / 12</span>
+         <span class="deck-foot-arrow">
+           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+         </span>
+       </div>
+     </div>
+    </div>
+   </div>
   </div>
 </section>
 
@@ -446,6 +783,27 @@
 <footer>
   <strong>INFO 290: Fundamentals of Generative AI</strong> &nbsp;&middot;&nbsp; Spring 2026 &nbsp;&middot;&nbsp; UC Berkeley School of Information
 </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+  new Swiper('.hero-deck', {
+    effect: 'cards',
+    grabCursor: true,
+    loop: true,
+    speed: 700,
+    cardsEffect: {
+      slideShadows: false,
+      perSlideOffset: 9,
+      perSlideRotate: 3,
+    },
+    autoplay: {
+      delay: 2400,
+      disableOnInteraction: false,
+      pauseOnMouseEnter: true,
+    },
+    a11y: { enabled: false },
+  });
+</script>
 
 </body>
 </html>
