@@ -85,7 +85,7 @@
     .hero-deck {
       width: 100%;
       max-width: 340px;
-      height: 420px;
+      height: 540px;
       justify-self: center;
       overflow: visible; /* let the trailing card's rotation bleed out */
     }
@@ -146,6 +146,17 @@
       border: 1px solid rgba(253,181,21,.35);
       padding: 5px 12px;
       border-radius: 100px;
+    }
+
+    .deck-banner {
+      display: block;
+      width: calc(100% + 56px);
+      height: 180px;
+      margin: -28px -28px 16px;
+      object-fit: cover;
+      border-radius: 22px 22px 0 0;
+      position: relative;
+      z-index: 1;
     }
 
     .deck-title {
@@ -212,7 +223,7 @@
       }
       .hero-deck {
         max-width: 380px;
-        height: 460px;
+        height: 540px;
         justify-self: end;
       }
     }
@@ -618,6 +629,7 @@
     <div class="swiper-wrapper">
      <div class="deck-card swiper-slide">
        <div>
+         <img class="deck-banner" src="images/visioncart.png" alt="">
          <span class="deck-type">Agentic · Multimodal</span>
          <div class="deck-title">VisionCart</div>
          <div class="deck-sub">A 4-agent LangGraph pipeline that turns a Pinterest-style vision board into ranked, live product results from real retailers.</div>
@@ -633,6 +645,7 @@
 
      <div class="deck-card swiper-slide">
        <div>
+         <img class="deck-banner" src="https://api.dicebear.com/9.x/shapes/svg?seed=music-memory&backgroundColor=003262,1d4a8a,0f5499&backgroundType=gradientLinear&scale=120" alt="">
          <span class="deck-type">RAG · Healthcare</span>
          <div class="deck-title">Music &amp; Memory</div>
          <div class="deck-sub">Builds therapeutic playlists for dementia patients by grounding retrieval in the reminiscence bump, region, and life events.</div>
@@ -648,6 +661,7 @@
 
      <div class="deck-card swiper-slide">
        <div>
+         <img class="deck-banner" src="https://api.dicebear.com/9.x/shapes/svg?seed=function-calling-slm&backgroundColor=003262,1d4a8a,0f5499&backgroundType=gradientLinear&scale=120" alt="">
          <span class="deck-type">Fine-Tuning · RL</span>
          <div class="deck-title">Sub-3B Function-Calling SLMs</div>
          <div class="deck-sub">Teaches small language models to reliably call APIs through SFT with function masking, GRPO, and easy-to-hard curriculum learning.</div>
@@ -663,6 +677,7 @@
 
      <div class="deck-card swiper-slide">
        <div>
+         <img class="deck-banner" src="images/wildfire-simulation.png" alt="">
          <span class="deck-type">Simulation · Policy</span>
          <div class="deck-title">Wildfire Mitigation</div>
          <div class="deck-sub">Agent-based simulation of Berkeley Hills homeowners deciding whether to harden their properties under shifting fire-risk policy.</div>
@@ -678,6 +693,7 @@
 
      <div class="deck-card swiper-slide">
        <div>
+         <img class="deck-banner" src="https://api.dicebear.com/9.x/shapes/svg?seed=neuro-orchestrator&backgroundColor=003262,1d4a8a,0f5499&backgroundType=gradientLinear&scale=120" alt="">
          <span class="deck-type">Agentic · Accessibility</span>
          <div class="deck-title">Neuro-Orchestrator</div>
          <div class="deck-sub">Personalized AI coaching for AuDHD users — task decomposition and reminders shaped by prior plans and neurodivergent-focused prompting.</div>
@@ -693,6 +709,7 @@
 
      <div class="deck-card swiper-slide">
        <div>
+         <img class="deck-banner" src="https://api.dicebear.com/9.x/shapes/svg?seed=bellybutton&backgroundColor=003262,1d4a8a,0f5499&backgroundType=gradientLinear&scale=120" alt="">
          <span class="deck-type">Agentic · Dialog</span>
          <div class="deck-title">Belly Button</div>
          <div class="deck-sub">A real-time conversational recommender that fuses live restaurant data with community sentiment to rank suggestions on the fly.</div>
@@ -708,6 +725,7 @@
 
      <div class="deck-card swiper-slide">
        <div>
+         <img class="deck-banner" src="images/marketing-asset.png" alt="">
          <span class="deck-type">RAG · Creative</span>
          <div class="deck-title">Marketing Asset Gen</div>
          <div class="deck-sub">Generates film marketing taglines and poster art grounded in TMDB retrieval and sharpened by an LLM-as-Judge refinement loop.</div>
@@ -723,6 +741,7 @@
 
      <div class="deck-card swiper-slide">
        <div>
+         <img class="deck-banner" src="https://api.dicebear.com/9.x/shapes/svg?seed=ux-research-rag&backgroundColor=003262,1d4a8a,0f5499&backgroundType=gradientLinear&scale=120" alt="">
          <span class="deck-type">RAG · Research</span>
          <div class="deck-title">UX Research RAG</div>
          <div class="deck-sub">Turns raw interview transcripts into traceable user stories and pain points, comparing ChromaDB vs. FAISS retrieval on the same corpus.</div>
@@ -738,6 +757,7 @@
 
      <div class="deck-card swiper-slide">
        <div>
+         <img class="deck-banner" src="https://api.dicebear.com/9.x/shapes/svg?seed=lawllm&backgroundColor=003262,1d4a8a,0f5499&backgroundType=gradientLinear&scale=120" alt="">
          <span class="deck-type">RAG · Legal</span>
          <div class="deck-title">LawLLM</div>
          <div class="deck-sub">A copyright-law research assistant that pits a FAISS-backed RAG pipeline against in-context case briefs — with human evaluation on both.</div>
@@ -753,6 +773,7 @@
 
      <div class="deck-card swiper-slide">
        <div>
+         <img class="deck-banner" src="https://api.dicebear.com/9.x/shapes/svg?seed=rental-market&backgroundColor=003262,1d4a8a,0f5499&backgroundType=gradientLinear&scale=120" alt="">
          <span class="deck-type">Agentic · Real Estate</span>
          <div class="deck-title">Rental Market Intel</div>
          <div class="deck-sub">A multi-agent researcher that scrapes live listings, cross-references market signals, and synthesizes investor-ready rental intelligence.</div>
@@ -768,6 +789,7 @@
 
      <div class="deck-card swiper-slide">
        <div>
+         <img class="deck-banner" src="https://api.dicebear.com/9.x/shapes/svg?seed=macromind&backgroundColor=003262,1d4a8a,0f5499&backgroundType=gradientLinear&scale=120" alt="">
          <span class="deck-type">RAG · Health</span>
          <div class="deck-title">MacroMind</div>
          <div class="deck-sub">Nutrition tracking plus constraint-aware meal planning — respects macros, allergies, and pantry state when suggesting what to eat next.</div>
@@ -783,6 +805,7 @@
 
      <div class="deck-card swiper-slide">
        <div>
+         <img class="deck-banner" src="https://api.dicebear.com/9.x/shapes/svg?seed=automated-librarian&backgroundColor=003262,1d4a8a,0f5499&backgroundType=gradientLinear&scale=120" alt="">
          <span class="deck-type">RAG · Documents</span>
          <div class="deck-title">Automated Librarian</div>
          <div class="deck-sub">A 5-modality RAG system — text, tables, images, audio, and video — unified so users can query any document type with one question.</div>

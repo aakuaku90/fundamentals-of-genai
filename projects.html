@@ -218,37 +218,52 @@
     }
     .card-footer svg { opacity: .7; }
 
-    /* ── MODAL OVERLAY ── */
+    /* ── SIDEBAR OVERLAY ── */
     #overlay {
-      display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,20,50,.55);
+      background: transparent;
       z-index: 200;
-      backdrop-filter: blur(3px);
-      overflow-y: auto;
-      padding: 32px 16px;
+      visibility: hidden;
+      transition: visibility .25s ease;
     }
-    #overlay.open { display: flex; align-items: flex-start; justify-content: center; }
+    #overlay.open {
+      visibility: visible;
+    }
 
     .modal {
       background: #fff;
-      border-radius: 16px;
-      max-width: 760px;
-      width: 100%;
-      position: relative;
-      box-shadow: 0 24px 64px rgba(0,0,0,.22);
-      overflow: hidden;
-      animation: slideUp .2s ease;
+      position: fixed;
+      top: 0;
+      right: 0;
+      height: 100vh;
+      width: min(640px, 100%);
+      box-shadow: -24px 0 64px rgba(0,0,0,.22);
+      overflow-y: auto;
+      overflow-x: hidden;
+      transform: translateX(100%);
+      transition: transform .28s cubic-bezier(.22,.61,.36,1);
+      display: flex;
+      flex-direction: column;
     }
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
+    #overlay.open .modal {
+      transform: translateX(0);
     }
     .modal-hero {
-      color: #fff;
       position: relative;
+      background: #fff;
+      padding: 20px;
+    }
+    .modal-hero-media {
+      position: relative;
+      border-radius: 12px;
       overflow: hidden;
+      min-height: 240px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(0,0,0,.08);
     }
     .modal-hero-banner {
       position: absolute;
@@ -268,38 +283,38 @@
     }
     .modal-hero-content {
       position: relative;
-      padding: 60px 28px 28px;
-      background: linear-gradient(to bottom, rgba(0,50,98,.3) 0%, rgba(0,50,98,.78) 100%);
-    }
-    .modal-hero-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 12px;
+      padding: 60px 20px 20px;
+      background: linear-gradient(to bottom, rgba(0,50,98,0) 0%, rgba(0,50,98,.65) 45%, rgba(0,50,98,.9) 100%);
     }
     .modal-title {
       font-size: clamp(1.2rem, 2vw, 1.6rem);
       font-weight: 800;
       line-height: 1.25;
+      margin-bottom: 12px;
     }
     .modal-title span { color: var(--gold); }
     .modal-close {
-      background: rgba(255,255,255,.15);
+      position: sticky;
+      top: 16px;
+      align-self: flex-end;
+      margin: 16px 16px -50px auto;
+      z-index: 10;
+      background: rgba(0,0,0,.45);
       border: none;
       color: #fff;
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
       cursor: pointer;
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
       transition: background .15s;
+      backdrop-filter: blur(6px);
     }
-    .modal-close:hover { background: rgba(255,255,255,.28); }
+    .modal-close:hover { background: rgba(0,0,0,.65); }
     .modal-subtitle {
       font-size: .9rem;
       opacity: .82;
@@ -485,8 +500,11 @@
     /* ── RESPONSIVE ── */
     @media (max-width: 640px) {
       .grid { grid-template-columns: 1fr; }
+      .modal { width: 100%; box-shadow: none; }
       .modal-body { padding: 20px; }
-      .modal-hero-content { padding: 20px 20px 18px; }
+      .modal-hero { padding: 16px; }
+      .modal-hero-media { min-height: 200px; }
+      .modal-hero-content { padding: 40px 16px 16px; }
       .team-grid { grid-template-columns: 1fr 1fr; }
     }
   </style>
@@ -523,18 +541,16 @@
 <!-- ──────────── MODAL ──────────── -->
 <div id="overlay" role="dialog" aria-modal="true">
   <div class="modal" id="modal">
+    <button class="modal-close" id="modalClose" aria-label="Close">&times;</button>
     <div class="modal-hero" id="modalHero">
-      <img class="modal-hero-banner" id="modalHeroBanner" src="" alt="">
-      <div class="modal-hero-banner-noise"></div>
-      <div class="modal-hero-content">
-        <div class="modal-hero-top">
-          <div>
-            <div class="modal-title" id="modalTitle"></div>
-          </div>
-          <button class="modal-close" id="modalClose" aria-label="Close">&times;</button>
+      <div class="modal-hero-media">
+        <img class="modal-hero-banner" id="modalHeroBanner" src="" alt="">
+        <div class="modal-hero-banner-noise"></div>
+        <div class="modal-hero-content">
+          <div class="modal-title" id="modalTitle"></div>
+          <div class="modal-subtitle" id="modalSubtitle"></div>
+          <div class="modal-meta" id="modalMeta"></div>
         </div>
-        <div class="modal-subtitle" id="modalSubtitle"></div>
-        <div class="modal-meta" id="modalMeta"></div>
       </div>
     </div>
     <div class="modal-body" id="modalBody"></div>
@@ -589,7 +605,8 @@ const PROJECTS = [
       "CLIP cosine similarity used as primary objective quality signal requiring no manual labeling"
     ],
     techStack: ["LangGraph", "Qwen2.5-VL-7B", "Qwen2.5-3B", "SerpAPI", "CLIP", "HuggingFace", "Python"],
-    area: "Agentic AI · Multimodal"
+    area: "Agentic AI · Multimodal",
+    bannerImage: "images/visioncart.png"
   },
   {
     id: "bellybutton",
@@ -655,7 +672,8 @@ const PROJECTS = [
       "Genre-based FAISS filtering at k=5 improves stylistic diversity vs. zero-shot generation"
     ],
     techStack: ["Sentence-BERT", "FAISS", "Gemini 2.5 Flash", "Mistral-7B-Instruct", "TMDB API", "LLM-as-Judge", "Python"],
-    area: "RAG · Multimodal"
+    area: "RAG · Multimodal",
+    bannerImage: "images/marketing-asset.png"
   },
   {
     id: "function-calling-slm",
